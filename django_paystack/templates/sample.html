@@ -1,0 +1,18 @@
+{% load paystack %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Sample payment page</title>
+    <style>
+        .red{
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    {% paystack_button button_class="red" amount=3000 email="gbozee@gmail.com" %}
+</body>
+</html>

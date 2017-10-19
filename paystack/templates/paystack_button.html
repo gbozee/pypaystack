@@ -1,0 +1,18 @@
+<form>
+    <script src="https://js.paystack.co/v1/inline.js"></script>
+    <button class="{{button_class}}" id="{{button_id}}" type="button" onclick="payWithPaystack()"> Pay </button>
+</form>
+
+<script>
+    function payWithPaystack() {
+        var handler = PaystackPop.setup({
+            key: '{{key}}',
+            email: '{{email}}',
+            amount: {{amount }},
+    callback: function (response) {
+        window.location.href = "{{redirect_url}}&trxref=" + response.trxref
+    }
+        });
+    handler.openIframe();
+    }
+</script>
