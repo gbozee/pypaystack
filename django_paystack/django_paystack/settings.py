@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'paystack',
+    'django_paystack',
 ]
 
 MIDDLEWARE = [
@@ -55,7 +56,7 @@ ROOT_URLCONF = 'django_paystack.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR,'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -119,3 +120,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+PAYSTACK_PUBLIC_KEY=os.getenv('PAYSTACK_PUBLIC_KEY','')
+PAYSTACK_SECRET_KEY=os.getenv('PAYSTACK_SECRET_KEY','')
+PAYSTACK_FAILED_URL = "/google/api"
+PAYSTACK_SUCCESS_URL="/google/api"

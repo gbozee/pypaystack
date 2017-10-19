@@ -10,6 +10,8 @@ python:
 # command to install dependencies
 install:
   - pip install -r requirements.txt
+  - pip install mock==2.0
+  - pip install -e .
 # command to run tests
 script:
   - python django_paystack/manage.py test paystack # or py.test for Python versions 3.5 and below
