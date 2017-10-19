@@ -5,15 +5,16 @@ from django.views.generic import RedirectView, TemplateView
 # Create your views here.
 from . import settings
 from .signals import payment_verified
-from .utils import PaystackAPI
+from .utils import load_lib
 from django.contrib import messages
 
 
 def verify_payment(request, order):
     amount = request.GET.get('amount')
     txrf = request.GET.get('trxref')
+    PaystackAPI = load_lib()
     paystack_instance = PaystackAPI()
-    response = paystack_instance.verify_payment(txrf, int(amount))
+    response = paystack_instance.verify_payment(txrf, amount=int(amount))
     if response[0]:
         payment_verified.send(
             sender=PaystackAPI,
@@ -35,6 +36,6 @@ class SuccessView(RedirectView):
     permanent = True
 
     def get_redirect_url(self, *args, **kwargs):
-        if settings.PAYSTACK_SUCCESS_URL == 'paystack:failed_page':
+        if settings.PAYSTACK_SUCCESS_URL == 'paystack:success_page':
             return reverse(settings.PAYSTACK_SUCCESS_URL)
         return settings.PAYSTACK_SUCCESS_URL

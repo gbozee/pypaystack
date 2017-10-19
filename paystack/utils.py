@@ -1,6 +1,6 @@
 import requests
 from . import settings
-
+import importlib
 
 class PaystackAPI(object):
 
@@ -40,3 +40,8 @@ class PaystackAPI(object):
         path = "/transaction/verify/{}".format(code)
         response = self.make_request('GET', path)
         return self.verify_result(response, **kwargs)
+
+
+def load_lib(config=settings.PAYSTACK_LIB_MODULE):
+    module = importlib.import_module(config)
+    return module.PaystackAPI

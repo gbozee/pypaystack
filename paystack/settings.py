@@ -12,3 +12,4 @@ PAYSTACK_SUCCESS_URL = getattr(
     settings, 'PAYSTACK_SUCCESS_URL', 'paystack:success_page')
 
 PAYSTACK_API_URL = 'https://api.paystack.co'
+PAYSTACK_LIB_MODULE = getattr(settings, 'PAYSTACK_LIB_MODULE','paystack.utils')
