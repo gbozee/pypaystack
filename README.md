@@ -11,7 +11,7 @@ Usage:
 
 1. Install `django-paystack`
 ```
-pip install -e https://github.com/gbozee/django-paystack.git@master#egg=paystack
+pip install -e git+https://github.com/gbozee/django-paystack.git@master#egg=paystack
 ```
 
 2. Add `paystack` to your `settings` module
