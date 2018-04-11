@@ -144,3 +144,34 @@ The templates used are as follows.
 paystack/failed-page.html
 paystack/success-page.html
 ```
+
+## Webhook.
+In order to listen and respond to events that happen from the paystack dashboard on your site, you are required as a developer to provide a publicly available url as a webhook.
+
+This library provides the webhook url and exposes a signal for you to listen to and respond to any event sent by paystack
+
+```
+from paystack.signals import event_signal
+from django.dispatch import receiver
+
+@reciever(event_signal)
+def on_event_received(sender, event, data):
+   # sender is the raw request
+   # event is the event name that was passed https://developers.paystack.co/docs/events
+   # data is the available data tied to the event
+   pass
+```
+
+You would need to register the following url
+`http://<domain_name>/paystack/webhook/`
+
+whatever your `<domain_name> ` is, you would need to set it to `PAYSTACK_WEBHOOK_DOMAIN` in your `settings.py`
+
+for example, assuming you are using ngrok during development, in your `settings.py` add the following config
+
+```
+PAYSTACK_WEBHOOK_DOMAIN=13232323.ngrok.io
+```
+
+and your webhook url that you would paste at paystack dashboard would be 
+http://13232323.ngrok.io/paystack/webhook/
