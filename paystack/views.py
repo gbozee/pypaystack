@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.generic import RedirectView, TemplateView
 # Create your views here.
-from . import settings, signals,utils
+from . import settings, signals, utils
 from .signals import payment_verified
 from .utils import load_lib
 from django.contrib import messages
@@ -37,6 +37,18 @@ class FailedView(RedirectView):
         return settings.PAYSTACK_FAILED_URL
 
 
+def success_redirect_view(request, order_id):
+    url = settings.PAYSTACK_SUCCESS_URL
+    if url == 'paystack:success_page':
+        url = reverse(url)
+    return redirect(url, permanent=True)
+
+def failure_redirect_view(request, order_id):
+    url = settings.PAYSTACK_FAILED_URL
+    if url == 'paystack:failed_page':
+        url = reverse(url)
+    return redirect(url, permanent=True)
+
 class SuccessView(RedirectView):
     permanent = True
 
@@ -55,4 +67,3 @@ def webhook_view(request):
         signals.event_signal.send(
             sender=request, event=payload['event'], data=payload['data'])
     return JsonResponse({'status': "Success"})
-
