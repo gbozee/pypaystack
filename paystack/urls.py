@@ -1,5 +1,5 @@
 from django.conf.urls import url
-
+from django.views.decorators.csrf import csrf_exempt
 
 from . import settings
 from . import views
@@ -15,5 +15,5 @@ urlpatterns = [
         views.TemplateView.as_view(template_name='paystack/failed-page.html'), name='failed_page'),
     url(r'^success-page/$',
         views.TemplateView.as_view(template_name='paystack/success-page.html'), name='success_page'),
-
+    url(r'^webhook/$', csrf_exempt(views.webhook_view), name='webhook'),
 ]
