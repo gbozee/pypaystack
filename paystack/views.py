@@ -19,7 +19,7 @@ def verify_payment(request, order):
     txrf = request.GET.get('trxref')
     PaystackAPI = load_lib()
     paystack_instance = PaystackAPI()
-    response = paystack_instance.verify_payment(txrf, amount=int(amount),order=order)
+    response = paystack_instance.verify_payment(txrf, amount=int(amount), order=order)
     if response[0]:
         payment_verified.send(
             sender=PaystackAPI,
