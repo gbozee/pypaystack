@@ -25,7 +25,7 @@ class PaystackTestCase(TestCase):
                 True, "verification successful"))
         response = self.client.get(
             "{}?amount=30000&trxref=biola23".format(reverse('paystack:verify_payment', args=['1234'])))
-        mock_instance.verify_payment.assert_called_once_with("biola23", amount=30000)
+        mock_instance.verify_payment.assert_called_once_with("biola23", amount=30000, )
         self.assertEqual(response.url, reverse(
             'paystack:successful_verification', args=['1234']))
         response = self.client.get(response.url)
