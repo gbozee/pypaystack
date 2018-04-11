@@ -1,6 +1,9 @@
+import hmac
+import hashlib
 import requests
 from . import settings
 import importlib
+
 
 class PaystackAPI(object):
 
@@ -45,3 +48,9 @@ class PaystackAPI(object):
 def load_lib(config=settings.PAYSTACK_LIB_MODULE):
     module = importlib.import_module(config)
     return module.PaystackAPI
+
+
+def generate_digest(data):
+    return hmac.new(settings.PAYSTACK_SECRET_KEY.encode('utf-8'),
+                    msg=data,
+                    digestmod=hashlib.sha512).hexdigest()  # request body hash digest
