@@ -36,7 +36,7 @@ urlpatterns = [
    from django.url import path, include
 urlpatterns = [
    ...,
-   path("paystack", include('paystack.urls',namespace='paystack')),
+   path("paystack", include(('paystack.urls','paystack'),namespace='paystack')),
 ]
 ```
 4. Login to [Paystack settings Dashboard](https://dashboard.paystack.com/#/settings/developer) and fetch your `PUBLIC_KEY` and `SECRET_KEY`. paste these keys in your `settings.py`
