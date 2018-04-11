@@ -1,5 +1,4 @@
-import hmac
-import hashlib
+
 import json
 import base64
 from django.shortcuts import render
@@ -8,7 +7,7 @@ from django.utils import timezone
 from django.http import JsonResponse
 from django.views.generic import RedirectView, TemplateView
 # Create your views here.
-from . import settings, signals
+from . import settings, signals,utils
 from .signals import payment_verified
 from .utils import load_lib
 from django.contrib import messages
@@ -49,9 +48,7 @@ class SuccessView(RedirectView):
 
 def webhook_view(request):
     # ensure that all parameters are in the bytes representation
-    digest = hmac.new(settings.PAYSTACK_SECRET_KEY.encode('utf-8'),
-                      msg=request.body,
-                      digestmod=hashlib.sha512).hexdigest()  # request body hash digest
+    digest = utils.generate_digest(request.body)
     signature = request.META['HTTP_X_PAYSTACK_SIGNATURE']
     if digest == signature:
         payload = json.loads(request.body)
