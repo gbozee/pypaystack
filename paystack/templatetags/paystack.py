@@ -4,6 +4,7 @@ from django.shortcuts import reverse
 from django.utils.html import format_html
 from .. import settings
 from django.utils.crypto import get_random_string
+from paystack.utils import get_js_script
 register = template.Library()
 
 
@@ -24,5 +25,6 @@ def paystack_button(context, button_id="django-paystack-button", button_class=""
         'ref': new_ref,
         'email': email,
         'amount': new_amount,
-        'redirect_url': new_redirect_url
+        'redirect_url': new_redirect_url,
+        'js_url': get_js_script()
     }
