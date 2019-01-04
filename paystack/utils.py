@@ -21,6 +21,7 @@ class PaystackAPI(object):
         self.customer_api = api.Customer(self.make_request)
         self.transfer_api = api.Transfer(self.make_request)
 
+
     def make_request(self, method, path, **kwargs):
         options = {
             "GET": requests.get,
@@ -60,6 +61,7 @@ def generate_digest(data):
         digestmod=hashlib.sha512).hexdigest()  # request body hash digest
 
 
+
 def get_js_script():
     return "https://js.paystack.co/v1/inline.js"
 
@@ -80,3 +82,4 @@ class MockRequest(object):
         if self.overwrite:
             return self.response
         return {'data': self.response}
+

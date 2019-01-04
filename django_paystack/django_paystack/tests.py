@@ -31,6 +31,7 @@ class PaystackTestCase(TestCase):
                          reverse(
                              'paystack:successful_verification',
                              args=['1234']))
+
         response = self.client.get(response.url)
         self.assertEqual(response.url, reverse('paystack:success_page'))
 
