@@ -9,9 +9,10 @@ python:
   - "3.7-dev" # 3.7 development branch
 # command to install dependencies
 install:
-  - pip install -r requirements.txt
+  - pip install -r requirements/test.txt
   - pip install mock==2.0
   - pip install -e .
 # command to run tests
 script:
-  - python django_paystack/manage.py test django_paystack # or py.test for Python versions 3.5 and below
+  - pytest
+  - pytest django_paystack/django_paystack
