@@ -364,3 +364,18 @@ class TestTransactionTestCase(TestCase):
         self.assertFalse(result[0])
         self.assertEqual(result[1],
                          "The customer specified has no saved authorizations")
+
+    @mock.patch('requests.get')
+    def test_get_balance(self, mock_get):
+        mock_get.return_value = MockRequest({
+            "status":
+            True,
+            "message":
+            "Balances retrieved",
+            "data": [{
+                "currency": "NGN",
+                "balance": 123120000
+            }]
+        })
+        result = self.api.transfer_api.check_balance()
+        self.assertEqual(result, [{"currency": "NGN", "balance": 1231200}])

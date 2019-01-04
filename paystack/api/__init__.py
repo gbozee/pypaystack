@@ -126,6 +126,15 @@ class Transfer(BaseClass):
         }
         return options.get(bank_name)
 
+    def check_balance(self):
+        path = "/balance"
+        result = self.make_request('GET', path)
+        data = result.json().get('data')
+        return [{
+            'currency': x['currency'],
+            'balance': x['balance'] / 100
+        } for x in data]
+
 
 class Transaction(BaseClass):
     def verify_result(self, response, **kwargs):
