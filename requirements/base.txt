@@ -1,0 +1,4 @@
+certifi==2017.7.27.1 
+django==1.11.17 
+pytz==2017.2 
+requests==2.20.0 
