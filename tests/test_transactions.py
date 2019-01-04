@@ -110,7 +110,7 @@ class TestTransactionTestCase(TestCase):
         }
         code = "1234"
         mock_get.return_value = MockRequest(response)
-        result = self.api.transaction_api.verify_payment(code, amount=27000)
+        result = self.api.transaction_api.verify_payment(code)
         mock_get.assert_called_once_with(
             "{}/transaction/verify/{}".format(self.api.base_url, code),
             headers=self.headers)

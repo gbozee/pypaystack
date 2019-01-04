@@ -66,7 +66,7 @@ class Transfer(BaseClass):
         path = "/transfer/finalize_transfer"
         json = {"transfer_code": transfer_recipient, "otp": code}
         req = self.make_request('POST', path, json=json)
-        return self.result_format(req, lambda x: (True, ))
+        return self.result_format(req, lambda x: (True, x))
 
     def enable_otp(self, status=True, code=None):
         url = "/transfer/enable_otp"
@@ -146,7 +146,7 @@ class Transaction(BaseClass):
                 if data["amount"] == int(amount):
                     return True, result["message"]
                 return False, data["amount"]
-            return True, result["message"]
+            return True, result["message"], data
 
         if response.status_code >= 400:
             return False, "Could not verify transaction"
