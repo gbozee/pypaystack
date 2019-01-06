@@ -129,11 +129,13 @@ class Transfer(BaseClass):
     def check_balance(self):
         path = "/balance"
         result = self.make_request('GET', path)
-        data = result.json().get('data')
+        data = result.json()
+        if not data['status']:
+            raise Exception("Invalid Key sent.")
         return [{
             'currency': x['currency'],
             'balance': x['balance'] / 100
-        } for x in data]
+        } for x in data.get('data')]
 
 
 class Transaction(BaseClass):
