@@ -23,6 +23,11 @@ class Customer(BaseClass):
 
 
 class Transfer(BaseClass):
+    def get_banks(self):
+        path = "/bank"
+        response = self.make_request('GET', path)
+        return self.result_format(response)
+
     def create_recipient(self, account_name, account_id, bank):
         path = "/transferrecipient"
         json = {
@@ -232,10 +237,5 @@ class Transaction(BaseClass):
                 else:
                     params[key] = value
         path = "/transaction"
-        response = self.make_request('GET', path, data=params)
-        return self.result_format(response)
-
-    def get_banks(self):
-        path = "/bank"
-        response = self.make_request('GET', path)
+        response = self.make_request('GET', path, params=params)
         return self.result_format(response)
