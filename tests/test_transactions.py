@@ -265,6 +265,39 @@ class TestTransactionTestCase(TestCase):
         self.assertEqual(result[1], "Invalid key")
 
     @mock.patch('requests.post')
+    def test_initialize_transaction_success(self, mock_post):
+        result = {
+            "status": True,
+            "message": "Authorization URL created",
+            "data": {
+                "authorization_url":
+                "https://checkout.paystack.com/0peioxfhpn",
+                "access_code": "0peioxfhpn",
+                "reference": "7PVGX8MEk85tgeEpVDtD"
+            }
+        }
+        mock_post.return_value = MockRequest(result)
+        json_data = {
+            'reference': "7PVGX8MEk85tgeEpVDtD",
+            'email': 'james@example.com',
+            'amount': 20000,
+            'callback_url': "http://example.com"
+        }
+        response = self.api.transaction_api.initialize_transaction(**json_data)
+        mock_post.assert_called_once_with(
+            "{}/transaction/initialize".format(self.api.base_url),
+            json={
+                "reference": json_data['reference'],
+                'email': json_data['email'],
+                'amount': json_data['amount'] * 100,
+                'callback_url': json_data['callback_url']
+            },
+            headers=self.headers)
+        self.assertTrue(response[0])
+        self.assertEqual(response[1], result['message'])
+        self.assertEqual(response[2], result['data'])
+
+    @mock.patch('requests.post')
     def test_create_recipient_success(self, mock_post):
         result = {
             "status": True,

@@ -195,3 +195,47 @@ class Transaction(BaseClass):
         }
         response = self.make_request('POST', path, json=json_data)
         return self.result_format(response)
+
+    def check_authorization(self, **kwargs):
+        """
+        :data:{
+            authorization_code,
+            email,
+            amount
+        }"""
+        path = "/transaction/check_authorization"
+        json_data = {
+            'authorization_code': kwargs['authorization_code'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)
+
+    def get_transactions(self,
+                         perPage=50,
+                         customer_id=None,
+                         status=None,
+                         _from=None,
+                         _to=None,
+                         amount=None):
+        params = {'perPage': perPage}
+        for key, value in {
+                'status': status,
+                'customer': customer_id,
+                'from': _from,
+                'to': _to
+        }.items():
+            if value:
+                if key == 'amount':
+                    params[key] = value * 100
+                else:
+                    params[key] = value
+        path = "/transaction"
+        response = self.make_request('GET', path, data=params)
+        return self.result_format(response)
+
+    def get_banks(self):
+        path = "/bank"
+        response = self.make_request('GET', path)
+        return self.result_format(response)
