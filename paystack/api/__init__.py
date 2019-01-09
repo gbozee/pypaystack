@@ -66,7 +66,7 @@ class Transfer(BaseClass):
         path = "/transfer/finalize_transfer"
         json = {"transfer_code": transfer_recipient, "otp": code}
         req = self.make_request('POST', path, json=json)
-        return self.result_format(req, lambda x: (True, ))
+        return self.result_format(req, lambda x: (True, x))
 
     def enable_otp(self, status=True, code=None):
         url = "/transfer/enable_otp"
@@ -126,6 +126,17 @@ class Transfer(BaseClass):
         }
         return options.get(bank_name)
 
+    def check_balance(self):
+        path = "/balance"
+        result = self.make_request('GET', path)
+        data = result.json()
+        if not data['status']:
+            raise Exception("Invalid Key sent.")
+        return [{
+            'currency': x['currency'],
+            'balance': x['balance'] / 100
+        } for x in data.get('data')]
+
 
 class Transaction(BaseClass):
     def verify_result(self, response, **kwargs):
@@ -137,7 +148,7 @@ class Transaction(BaseClass):
                 if data["amount"] == int(amount):
                     return True, result["message"]
                 return False, data["amount"]
-            return True, result["message"]
+            return True, result["message"], data
 
         if response.status_code >= 400:
             return False, "Could not verify transaction"
@@ -146,3 +157,41 @@ class Transaction(BaseClass):
         path = "/transaction/verify/{}".format(code)
         response = self.make_request("GET", path)
         return self.verify_result(response, **kwargs)
+
+    def initialize_transaction(self, **kwargs):
+        """When we expect paystack to respond back to us once
+        the payment is successful but not processing it
+        from our end
+        :params: kwargs{
+            reference,
+            email,
+            amount, in naira.
+            callback_url
+        }
+        """
+        path = "/transaction/initialize"
+        json_data = {
+            'reference': kwargs['reference'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100,
+            'callback_url': kwargs['callback_url']
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)
+
+    def recurrent_charge(self, **kwargs):
+        """
+        When attempting to bill an existing customers that has already paid
+         through us
+        :data : {
+            'authorization_code','email','amount'
+        }
+        """
+        path = "/transaction/charge_authorization"
+        json_data = {
+            'authorization_code': kwargs['authorization_code'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)

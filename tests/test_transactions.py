@@ -110,12 +110,159 @@ class TestTransactionTestCase(TestCase):
         }
         code = "1234"
         mock_get.return_value = MockRequest(response)
-        result = self.api.transaction_api.verify_payment(code, amount=27000)
+        result = self.api.transaction_api.verify_payment(code)
         mock_get.assert_called_once_with(
             "{}/transaction/verify/{}".format(self.api.base_url, code),
             headers=self.headers)
         self.assertTrue(result[0])
         self.assertEqual(result[1], "Verification successful")
+        self.assertEqual(
+            result[2]['customer'], {
+                "id": 84312,
+                "customer_code": "CUS_hdhye17yj8qd2tx",
+                "first_name": "BoJack",
+                "last_name": "Horseman",
+                "email": "bojack@horseman.com"
+            })
+
+    @mock.patch('requests.post')
+    def test_recurrent_charge_success_valid(self, mock_post):
+        result = {
+            "status": True,
+            "message": "Charge attempted",
+            "data": {
+                "amount": 500000,
+                "currency": "NGN",
+                "transaction_date": "2016-10-01T14:29:53.000Z",
+                "status": "success",
+                "reference": "0bxco8lyc2aa0fq",
+                "domain": "live",
+                "metadata": None,
+                "gateway_response": "Successful",
+                "message": None,
+                "channel": "card",
+                "ip_address": None,
+                "log": None,
+                "fees": None,
+                "authorization": {
+                    "authorization_code": "AUTH_5z72ux0koz",
+                    "bin": "408408",
+                    "last4": "4081",
+                    "exp_month": "12",
+                    "exp_year": "2020",
+                    "channel": "card",
+                    "card_type": "visa DEBIT",
+                    "bank": "Test Bank",
+                    "country_code": "NG",
+                    "brand": "visa",
+                    "reusable": True,
+                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4"
+                },
+                "customer": {
+                    "id": 90831,
+                    "customer_code": "CUS_fxg9930u8pqeiu",
+                    "first_name": "Bojack",
+                    "last_name": "Horseman",
+                    "email": "bojack@horsinaround.com"
+                },
+                "plan": 0
+            }
+        }
+        mock_post.return_value = MockRequest(result)
+        json_data = dict(
+            authorization_code="AUTH_5z72ux0koz",
+            email="bojack@horsinaround.com",
+            amount=5000)
+        response = self.api.transaction_api.recurrent_charge(**json_data)
+        mock_post.assert_called_once_with(
+            "{}/transaction/charge_authorization".format(self.api.base_url),
+            json={
+                "authorization_code": json_data['authorization_code'],
+                'email': json_data['email'],
+                'amount': json_data['amount'] * 100
+            },
+            headers=self.headers)
+        self.assertTrue(response[0])
+        self.assertEqual(response[1], result['message'])
+        self.assertEqual(response[2], result['data'])
+        self.assertEqual(response[2]['status'], 'success')
+
+    @mock.patch('requests.post')
+    def test_recurrent_charge_success_invalid(self, mock_post):
+        result = {
+            "status": True,
+            "message": "Charge Attempted",
+            "data": {
+                "amount": 27000,
+                "currency": "NGN",
+                "transaction_date": "2016-10-01T11:03:09.000Z",
+                "status": "failed",
+                "reference": "DG4uishudoq90LD",
+                "domain": "test",
+                "metadata": 0,
+                "gateway_response": "Insufficient Funds",
+                "message": None,
+                "channel": "card",
+                "ip_address": "41.1.25.1",
+                "log": None,
+                "fees": None,
+                "authorization": {
+                    "authorization_code": "AUTH_5z72ux0koz",
+                    "bin": "408408",
+                    "last4": "4081",
+                    "exp_month": "12",
+                    "exp_year": "2020",
+                    "channel": "card",
+                    "card_type": "visa DEBIT",
+                    "bank": "Test Bank",
+                    "country_code": "NG",
+                    "brand": "visa",
+                    "reusable": True,
+                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4"
+                },
+                "customer": {
+                    "id": 84312,
+                    "customer_code": "CUS_hdhye17yj8qd2tx",
+                    "first_name": "BoJack",
+                    "last_name": "Horseman",
+                    "email": "bojack@horseman.com"
+                },
+                "plan": "PLN_0as2m9n02cl0kp6"
+            }
+        }
+        mock_post.return_value = MockRequest(result)
+        json_data = dict(
+            authorization_code="AUTH_5z72ux0koz",
+            email="bojack@horsinaround.com",
+            amount=5000)
+        response = self.api.transaction_api.recurrent_charge(**json_data)
+        mock_post.assert_called_once_with(
+            "{}/transaction/charge_authorization".format(self.api.base_url),
+            json={
+                "authorization_code": json_data['authorization_code'],
+                'email': json_data['email'],
+                'amount': json_data['amount'] * 100
+            },
+            headers=self.headers)
+        self.assertTrue(response[0])
+        self.assertEqual(response[1], result['message'])
+        self.assertEqual(response[2], result['data'])
+        self.assertEqual(response[2]['status'], 'failed')
+
+    @mock.patch('requests.post')
+    def test_recurrent_charge_success_failed(self, mock_post):
+        mock_post.return_value = MockRequest(
+            {
+                "status": False,
+                "message": "Invalid key"
+            }, status_code=400)
+        json_data = dict(
+            authorization_code="AUTH_5z72ux0koz",
+            email="bojack@horsinaround.com",
+            amount=5000)
+        result = self.api.transaction_api.recurrent_charge(**json_data)
+        self.assertFalse(result[0])
+        self.assertEqual(result[1], "Invalid key")
 
     @mock.patch('requests.post')
     def test_create_recipient_success(self, mock_post):
@@ -364,3 +511,18 @@ class TestTransactionTestCase(TestCase):
         self.assertFalse(result[0])
         self.assertEqual(result[1],
                          "The customer specified has no saved authorizations")
+
+    @mock.patch('requests.get')
+    def test_get_balance(self, mock_get):
+        mock_get.return_value = MockRequest({
+            "status":
+            True,
+            "message":
+            "Balances retrieved",
+            "data": [{
+                "currency": "NGN",
+                "balance": 123120000
+            }]
+        })
+        result = self.api.transfer_api.check_balance()
+        self.assertEqual(result, [{"currency": "NGN", "balance": 1231200}])
