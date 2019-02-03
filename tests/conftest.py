@@ -1,4 +1,5 @@
 import pytest
+from unittest import mock
 from paystack.utils import PaystackAPI, MockRequest
 PAYSTACK_API_URL = 'https://api.paystack.co'
 
@@ -33,8 +34,12 @@ def get_request(mocker):
 @pytest.fixture
 def post_request(mocker):
     def _post_request(*args, **kwargs):
+        side_effect = kwargs.pop('side_effect', None)
         mock_post = mocker.patch('requests.post')
-        mock_post.return_value = MockRequest(*args, **kwargs)
+        if side_effect:
+            mock_post.side_effect = [MockRequest(x) for x in side_effect]
+        else:
+            mock_post.return_value = MockRequest(*args, **kwargs)
         return mock_post
 
     return _post_request
@@ -53,7 +58,13 @@ def put_request(mocker):
 @pytest.fixture
 def mock_assertion(headers, paystack_api):
     def _mock_assertion(mock_call, path, **kwargs):
+        side_effect = kwargs.pop('side_effect', None)
         url = "{}{}".format(paystack_api.base_url, path)
-        mock_call.assert_called_once_with(url, headers=headers, **kwargs)
+        if side_effect:
+            mock_call.assert_has_calls(
+                [mock.call(url, headers=headers, **x) for x in side_effect],
+                any_order=True)
+        else:
+            mock_call.assert_called_once_with(url, headers=headers, **kwargs)
 
     return _mock_assertion

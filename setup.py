@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-paystack',
-    version='0.4',
+    version='0.5',
     packages=find_packages(),
     include_package_data=True,
     license='MIT License',  # example license
@@ -18,7 +18,7 @@ setup(
     url='https://www.example.com/',
     author='Biola Oyeniyi',
     author_email='gbozee@gmail.com',
-    install_requires=['requests', 'future'],
+    install_requires=['requests', 'future', 'Paperboy'],
     classifiers=[
         'Environment :: Web Environment',
         'Framework :: Django',
