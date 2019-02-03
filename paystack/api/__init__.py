@@ -239,3 +239,7 @@ class Transaction(BaseClass):
         path = "/transaction"
         response = self.make_request('GET', path, params=params)
         return self.result_format(response)
+
+
+class PlanAndSubscription(BaseClass):
+    pass
