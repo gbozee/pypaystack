@@ -21,7 +21,6 @@ class PaystackAPI(object):
         self.customer_api = api.Customer(self.make_request)
         self.transfer_api = api.Transfer(self.make_request)
 
-
     def make_request(self, method, path, **kwargs):
         options = {
             "GET": requests.get,
@@ -42,6 +41,12 @@ class PaystackAPI(object):
     def verify_payment(self, code, **kwargs):
         return self.transaction_api.verify_payment(code, **kwargs)
 
+    def generate_digest(self, data):
+        return hmac.new(
+            self.secret_key.encode("utf-8"),
+            msg=data,
+            digestmod=hashlib.sha512).hexdigest()
+
 
 def load_lib(config=None):
     """
@@ -59,7 +64,6 @@ def generate_digest(data):
         settings.PAYSTACK_SECRET_KEY.encode("utf-8"),
         msg=data,
         digestmod=hashlib.sha512).hexdigest()  # request body hash digest
-
 
 
 def get_js_script():
@@ -82,4 +86,3 @@ class MockRequest(object):
         if self.overwrite:
             return self.response
         return {'data': self.response}
-
