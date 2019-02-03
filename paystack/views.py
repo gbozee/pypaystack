@@ -1,7 +1,7 @@
 import json
 from django.shortcuts import redirect, reverse
 from django.http import JsonResponse
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 # Create your views here.
 from . import settings, signals, utils
 from .signals import payment_verified

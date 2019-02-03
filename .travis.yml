@@ -1,6 +1,5 @@
 language: python
 python:
-  - "2.7"
   - "3.4"
   - "3.5"
   - "3.5-dev" # 3.5 development branch
@@ -15,5 +14,5 @@ install:
   - pip install -e .
 # command to run tests
 script:
-  - pytest
-  - pytest django_paystack/django_paystack
+  - pytest --cov=paystack
+  - pytest --cov=django_paystack django_paystack/django_paystack
