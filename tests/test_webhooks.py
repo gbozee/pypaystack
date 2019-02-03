@@ -5,6 +5,7 @@ import pytest
 
 @receiver(signals.successful_payment_signal)
 def signal_called(sender, **kwargs):
+    kwargs.pop('signal', None)
     generic_function(**kwargs)
 
 
@@ -14,17 +15,21 @@ def generic_function(**params):
 
 @receiver(signals.successful_transfer_signal)
 def signal_called_2(sender, **kwargs):
+    kwargs.pop('signal', None)
     generic_function(**kwargs)
 
 
 @receiver(signals.failed_transfer_signal)
 def signal_called_3(sender, **kwargs):
+    kwargs.pop('signal', None)
     generic_function(**kwargs)
 
 
 @pytest.fixture
 def mock_generic_fuc(mocker):
-    mock_successful_transer = mocker.patch('__main__.generic_function')
+    mock_successful_transer = mocker.patch('test_webhooks.generic_function')
+    mock_digest = mocker.patch('paystack.api.webhook.generate_digest')
+    mock_digest.return_value = "1001"
     return mock_successful_transer
 
 
@@ -106,18 +111,19 @@ def test_successful_webhook_signals(mock_generic_fuc, paystack_api):
                 "send_invoices": true,
                 "send_sms": true,
                 "currency": "NGN"
-            },
-   }
+            }
+            }
+
 }"""
     paystack_api.webhook_api.verify("1001", body)
     mock_generic_fuc.assert_called_once_with(
         data={
-            'amount': 100,
+            'amount': 100.0,
             'plan_object': {
                 "id": 6743,
                 "name": "Test Plans",
                 "plan_code": "PLN_tq8ur7pqz80fbpi",
-                "amount": 2000,
+                "amount": 2000.0,
                 "interval": "hourly",
                 "currency": "NGN"
             },
@@ -136,35 +142,35 @@ def test_successful_webhook_signals(mock_generic_fuc, paystack_api):
 def test_successful_transfer(mock_generic_fuc, paystack_api):
     body = """
     {
-      event: "transfer.success",
-      data: {
-        domain: "live",
-        amount: 10000,
-        currency: "NGN",
-        source: "balance",
-        source_details: null,
-        reason: "Bless you",
-        reference: "JDJDJ",
-        recipient: {
-          domain: "live",
-          type: "nuban",
-          currency: "NGN",
-          name: "Someone",
-          details: {
-            account_number: "0123456789",
-            account_name: null,
-            bank_code: "058",
-            bank_name: "Guaranty Trust Bank"
+      "event": "transfer.success",
+      "data": {
+        "domain": "live",
+        "amount": 10000,
+        "currency": "NGN",
+        "source": "balance",
+        "source_details": null,
+        "reason": "Bless you",
+        "reference": "JDJDJ",
+        "recipient": {
+          "domain": "live",
+          "type": "nuban",
+          "currency": "NGN",
+          "name": "Someone",
+          "details": {
+            "account_number": "0123456789",
+            "account_name": null,
+            "bank_code": "058",
+            "bank_name": "Guaranty Trust Bank"
           },
-          description: null,
-          metadata: null,
-          recipient_code: "RCP_xoosxcjojnvronx",
-          active: true
+          "description": null,
+          "metadata": null,
+          "recipient_code": "RCP_xoosxcjojnvronx",
+          "active": true
         },
-        status: "success",
-        transfer_code: "TRF_zy6w214r4aw9971",
-        transferred_at: "2017-03-25T17:51:24.000Z",
-        created_at: "2017-03-25T17:48:54.000Z"
+        "status": "success",
+        "transfer_code": "TRF_zy6w214r4aw9971",
+        "transferred_at": "2017-03-25T17:51:24.000Z",
+        "created_at": "2017-03-25T17:48:54.000Z"
       }
     }
     """
@@ -172,12 +178,13 @@ def test_successful_transfer(mock_generic_fuc, paystack_api):
     mock_generic_fuc.assert_called_once_with(
         transfer_code="TRF_zy6w214r4aw9971",
         data={
-            "amount": 100,
+            "amount": 100.0,
             "recipient": {
                 "recipient_code": "RCP_xoosxcjojnvronx",
             },
             "transfer_code": "TRF_zy6w214r4aw9971",
             "transferred_at": "2017-03-25T17:51:24.000Z",
+            "created_at": "2017-03-25T17:48:54.000Z"
         })
 
 
@@ -218,9 +225,9 @@ def test_failed_transfer(mock_generic_fuc, paystack_api):
     """
     paystack_api.webhook_api.verify("1001", body)
     mock_generic_fuc.assert_called_once_with(
-        transfer_code='RCP_7um8q67gj0v4n1c',
+        transfer_code='TRF_3g8pc1cfmn00x6u',
         data={
-            "amount": 100,
+            "amount": 100.0,
             "recipient": {
                 "recipient_code": "RCP_7um8q67gj0v4n1c",
             },
@@ -228,3 +235,42 @@ def test_failed_transfer(mock_generic_fuc, paystack_api):
             "transferred_at": None,
             "created_at": "2017-12-01T08:51:37.000Z"
         })
+
+
+def test_webhook_not_called(mock_generic_fuc, paystack_api):
+    body = """
+    {
+  "event": "transfer.failed",
+  "data": {
+    "domain": "test",
+    "amount": 10000,
+    "currency": "NGN",
+    "source": "balance",
+    "source_details": null,
+    "reason": "Test",
+    "reference": "XJKSKS",
+    "recipient": {
+      "domain": "live",
+      "type": "nuban",
+      "currency": "NGN",
+      "name": "Test account",
+      "details": {
+        "account_number": "0000000000",
+        "account_name": null,
+        "bank_code": "058",
+        "bank_name": "Zenith Bank"
+      },
+      "description": null,
+      "metadata": null,
+      "recipient_code": "RCP_7um8q67gj0v4n1c",
+      "active": true
+    },
+    "status": "failed",
+    "transfer_code": "TRF_3g8pc1cfmn00x6u",
+    "transferred_at": null,
+    "created_at": "2017-12-01T08:51:37.000Z"
+  }
+}
+    """
+    paystack_api.webhook_api.verify("1101", body)
+    mock_generic_fuc.assert_not_called()

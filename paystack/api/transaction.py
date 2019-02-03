@@ -1,0 +1,108 @@
+from .base import BaseClass
+
+
+class Customer(BaseClass):
+    def create_customer(self, data):
+        path = "/customer"
+        response = self.make_request('POST', path, json=data)
+        if response.status_code >= 400:
+            return None
+        return response.json()['data']['customer_code']
+
+
+class Transaction(BaseClass):
+    def verify_result(self, response, **kwargs):
+        if response.status_code == 200:
+            result = response.json()
+            data = result["data"]
+            amount = kwargs.get("amount")
+            if amount:
+                if data["amount"] == int(amount):
+                    return True, result["message"]
+                return False, data["amount"]
+            return True, result["message"], data
+
+        if response.status_code >= 400:
+            return False, "Could not verify transaction"
+
+    def verify_payment(self, code, **kwargs):
+        path = "/transaction/verify/{}".format(code)
+        response = self.make_request("GET", path)
+        return self.verify_result(response, **kwargs)
+
+    def initialize_transaction(self, **kwargs):
+        """When we expect paystack to respond back to us once
+        the payment is successful but not processing it
+        from our end
+        :params: kwargs{
+            reference,
+            email,
+            amount, in naira.
+            callback_url
+        }
+        """
+        path = "/transaction/initialize"
+        json_data = {
+            'reference': kwargs['reference'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100,
+            'callback_url': kwargs['callback_url']
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)
+
+    def recurrent_charge(self, **kwargs):
+        """
+        When attempting to bill an existing customers that has already paid
+         through us
+        :data : {
+            'authorization_code','email','amount'
+        }
+        """
+        path = "/transaction/charge_authorization"
+        json_data = {
+            'authorization_code': kwargs['authorization_code'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)
+
+    def check_authorization(self, **kwargs):
+        """
+        :data:{
+            authorization_code,
+            email,
+            amount
+        }"""
+        path = "/transaction/check_authorization"
+        json_data = {
+            'authorization_code': kwargs['authorization_code'],
+            'email': kwargs['email'],
+            'amount': kwargs['amount'] * 100
+        }
+        response = self.make_request('POST', path, json=json_data)
+        return self.result_format(response)
+
+    def get_transactions(self,
+                         perPage=50,
+                         customer_id=None,
+                         status=None,
+                         _from=None,
+                         _to=None,
+                         amount=None):
+        params = {'perPage': perPage}
+        for key, value in {
+                'status': status,
+                'customer': customer_id,
+                'from': _from,
+                'to': _to
+        }.items():
+            if value:
+                if key == 'amount':
+                    params[key] = value * 100
+                else:
+                    params[key] = value
+        path = "/transaction"
+        response = self.make_request('GET', path, params=params)
+        return self.result_format(response)

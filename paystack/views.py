@@ -1,17 +1,11 @@
-
 import json
-import base64
-from django.shortcuts import render
-from django.shortcuts import get_object_or_404, redirect, render, reverse
-from django.utils import timezone
+from django.shortcuts import redirect, reverse
 from django.http import JsonResponse
-from django.views.generic import RedirectView, TemplateView
+from django.views.generic import RedirectView
 # Create your views here.
 from . import settings, signals, utils
 from .signals import payment_verified
 from .utils import load_lib
-from django.contrib import messages
-from django.dispatch import receiver
 
 
 def verify_payment(request, order):
@@ -23,8 +17,11 @@ def verify_payment(request, order):
     if response[0]:
         payment_verified.send(
             sender=PaystackAPI,
-            ref=txrf, amount=int(amount) / 100, order=order)
-        return redirect(reverse('paystack:successful_verification', args=[order]))
+            ref=txrf,
+            amount=int(amount) / 100,
+            order=order)
+        return redirect(
+            reverse('paystack:successful_verification', args=[order]))
     return redirect(reverse('paystack:failed_verification', args=[order]))
 
 
@@ -43,11 +40,13 @@ def success_redirect_view(request, order_id):
         url = reverse(url)
     return redirect(url, permanent=True)
 
+
 def failure_redirect_view(request, order_id):
     url = settings.PAYSTACK_FAILED_URL
     if url == 'paystack:failed_page':
         url = reverse(url)
     return redirect(url, permanent=True)
+
 
 class SuccessView(RedirectView):
     permanent = True
@@ -60,10 +59,13 @@ class SuccessView(RedirectView):
 
 def webhook_view(request):
     # ensure that all parameters are in the bytes representation
-    digest = utils.generate_digest(request.body)
+    PaystackAPI = load_lib()
+    paystack_instance = PaystackAPI()
     signature = request.META['HTTP_X_PAYSTACK_SIGNATURE']
-    if digest == signature:
-        payload = json.loads(request.body)
-        signals.event_signal.send(
-            sender=request, event=payload['event'], data=payload['data'])
+    paystack_instance.webhook_api.verify(request.body, signature)
+    # digest = utils.generate_digest(request.body)
+    # if digest == signature:
+    #     payload = json.loads(request.body)
+    #     signals.event_signal.send(
+    #         sender=request, event=payload['event'], data=payload['data'])
     return JsonResponse({'status': "Success"})
