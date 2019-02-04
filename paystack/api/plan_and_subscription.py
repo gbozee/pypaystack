@@ -62,9 +62,6 @@ class PlanAndSubscription(BaseClass):
     def create_subscription(self, data):
         path = "/subscription"
         new_data = data.copy()
-        new_data['start_date'] = datetime.strptime(
-            new_data['start_date'],
-            "%Y-%m-%d").replace(microsecond=0).isoformat()
         response = self.make_request('POST', path, json=new_data)
         return self.result_format(response)
 

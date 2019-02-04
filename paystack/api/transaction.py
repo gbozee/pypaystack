@@ -5,9 +5,52 @@ class Customer(BaseClass):
     def create_customer(self, data):
         path = "/customer"
         response = self.make_request('POST', path, json=data)
+        # return self.result_format(response)
         if response.status_code >= 400:
             return None
         return response.json()['data']['customer_code']
+
+    def n_create_customer(self, data):
+        path = "/customer"
+        response = self.make_request('POST', path, json=data)
+        return self.result_format(response)
+        # if response.status_code >= 400:
+        #     return None
+        # return response.json()['data']['customer_code']
+
+    def list_customer(self, data):
+        path = "/customer"
+        response = self.make_request('GET', path, params=data)
+        return self.result_format(response)
+
+    def get_customer(self, customer_email):
+        path = "/customer/{}".format(customer_email)
+        response = self.make_request('GET', path)
+        return self.result_format(response)
+
+    def update_customer(self, customer_code, data):
+        path = '/customer/{}'.format(customer_code)
+        response = self.make_request('PUT', path, json=data)
+        return self.result_format(response)
+
+    def blacklist_customer(self, customer_code, blacklist=True):
+        data = {
+            'customer': customer_code,
+            'risk_action': 'deny' if blacklist else "allow"
+        }
+        path = "/customer/set_risk_action"
+        response = self.make_request('POST', path, json=data)
+        return self.result_format(response)
+
+    def deactivate_auth(self, authorization_code):
+        data = {'authorization_code': authorization_code}
+        path = "/customer/deactivate_authorization"
+        response = self.make_request('POST', path, json=data)
+
+        def callback(dd):
+            return dd['status'], dd['message']
+
+        return self.result_format(response, callback)
 
 
 class Transaction(BaseClass):

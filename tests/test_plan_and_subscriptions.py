@@ -235,16 +235,10 @@ def test_create_subscription_success(post_request, paystack_api,
         mock_post,
         "/subscription",
         json={
-            'customer':
-            data['customer'],
-            'plan':
-            data['plan'],
-            'authorization':
-            data['authorization'],
-            'start_date':
-            datetime.datetime.strptime(
-                data['start_date'],
-                "%Y-%m-%d").replace(microsecond=0).isoformat()
+            'customer': data['customer'],
+            'plan': data['plan'],
+            'authorization': data['authorization'],
+            'start_date': data['start_date'],
         })
     assert result[0]
     assert result[1] == api_response["message"]
@@ -269,16 +263,10 @@ def test_create_subscription_failed(post_request, paystack_api,
         mock_post,
         "/subscription",
         json={
-            'customer':
-            data['customer'],
-            'plan':
-            data['plan'],
-            'authorization':
-            data['authorization'],
-            'start_date':
-            datetime.datetime.strptime(
-                data['start_date'],
-                "%Y-%m-%d").replace(microsecond=0).isoformat()
+            'customer': data['customer'],
+            'plan': data['plan'],
+            'authorization': data['authorization'],
+            'start_date': data['start_date']
         })
     assert not result[0]
     assert result[1] == api_response['message']
