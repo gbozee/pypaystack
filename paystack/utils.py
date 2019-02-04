@@ -21,6 +21,7 @@ class PaystackAPI(object):
         self.customer_api = api.Customer(self.make_request)
         self.transfer_api = api.Transfer(self.make_request)
         self.webhook_api = api.Webhook(self.secret_key)
+        self.subscription_api = api.PlanAndSubscription(self.make_request)
 
     def make_request(self, method, path, **kwargs):
         options = {

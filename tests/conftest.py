@@ -61,9 +61,10 @@ def mock_assertion(headers, paystack_api):
         side_effect = kwargs.pop('side_effect', None)
         url = "{}{}".format(paystack_api.base_url, path)
         if side_effect:
-            mock_call.assert_has_calls(
-                [mock.call(url, headers=headers, **x) for x in side_effect],
-                any_order=True)
+            mock_calls = [
+                mock.call(url, headers=headers, **x) for x in side_effect
+            ]
+            mock_call.assert_has_calls(mock_calls, any_order=True)
         else:
             mock_call.assert_called_once_with(url, headers=headers, **kwargs)
 

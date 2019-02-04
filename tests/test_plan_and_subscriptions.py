@@ -228,7 +228,7 @@ def test_create_subscription_success(post_request, paystack_api,
         'customer': "customer email or code",
         'plan': "plan code",
         'authorization': 'customer authorization code',
-        'start_date': "2017-15-16"
+        'start_date': "2017-10-16"
     }
     result = paystack_api.subscription_api.create_subscription(data)
     mock_assertion(
@@ -243,7 +243,8 @@ def test_create_subscription_success(post_request, paystack_api,
             data['authorization'],
             'start_date':
             datetime.datetime.strptime(
-                data['start_date']).replace(microsecond=0).isoformat()
+                data['start_date'],
+                "%Y-%m-%d").replace(microsecond=0).isoformat()
         })
     assert result[0]
     assert result[1] == api_response["message"]
@@ -256,12 +257,12 @@ def test_create_subscription_failed(post_request, paystack_api,
         "status": False,
         "message": "The customer specified has no saved authorizations"
     }
-    mock_post = post_request(api_response)
+    mock_post = post_request(api_response, status_code=400)
     data = {
         'customer': "customer email or code",
         'plan': "plan code",
         'authorization': 'customer authorization code',
-        'start_date': "2017-15-16"
+        'start_date': "2017-10-16"
     }
     result = paystack_api.subscription_api.create_subscription(data)
     mock_assertion(
@@ -276,7 +277,8 @@ def test_create_subscription_failed(post_request, paystack_api,
             data['authorization'],
             'start_date':
             datetime.datetime.strptime(
-                data['start_date']).replace(microsecond=0).isoformat()
+                data['start_date'],
+                "%Y-%m-%d").replace(microsecond=0).isoformat()
         })
     assert not result[0]
     assert result[1] == api_response['message']
@@ -358,26 +360,30 @@ def test_list_subscriptions(get_request, paystack_api, mock_assertion):
     result = paystack_api.subscription_api.get_all_subscriptions(data)
     mock_assertion(mock_get, "/subscription", params=data)
     assert result[0]
-    assert result[1] == api_response[1]
-    assert result[2] == api_response[2]
+    assert result[1] == api_response['message']
+    assert result[2] == api_response['data']
 
 
-def disable_or_enable_subscription(post_request, paystack_api, mock_assertion):
+def test_enable_subscription(post_request, paystack_api, mock_assertion):
     api_response_enable = {
         "status": True,
         "message": "Subscription enabled successfully"
     }
-    api_response_disable = {
-        "status": True,
-        "message": "Subscription disabled successfully"
-    }
     mock_post_enable = post_request(api_response_enable)
-    mock_post_disable = post_request(api_response_disable)
     data = {'code': "SUB_vsyqdmlzble3uii", "token": "d7gofp6yppn3qz7"}
     result_enable = paystack_api.subscription_api.activate_subscription(data)
     mock_assertion(mock_post_enable, "/subscription/enable", json=data)
     assert result_enable[0]
     assert result_enable[1] == api_response_enable['message']
+
+
+def test_disable_subscription(post_request, paystack_api, mock_assertion):
+    api_response_disable = {
+        "status": True,
+        "message": "Subscription disabled successfully"
+    }
+    mock_post_disable = post_request(api_response_disable)
+    data = {'code': "SUB_vsyqdmlzble3uii", "token": "d7gofp6yppn3qz7"}
     result_disable = paystack_api.subscription_api.activate_subscription(
         data, False)
     mock_assertion(mock_post_disable, "/subscription/disable", json=data)
