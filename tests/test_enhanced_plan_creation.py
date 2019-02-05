@@ -137,14 +137,16 @@ def test_update_existing_multiple_plans(put_request, get_request, paystack_api,
     mock_put.assert_has_calls(
         [
             call(
-                "{}/plan/{data['plan']['ngn']}".format(paystack_api.base_url),
+                "{}/plan/{}".format(paystack_api.base_url,
+                                    data['plan']['ngn']),
                 json={
                     'name': new_data['name'],
                     'amount': new_data['amount']['ngn'] * 100
                 },
                 headers=headers),
             call(
-                "{}/plan/{data['plan']['usd']}".format(paystack_api.base_url),
+                "{}/plan/{}".format(paystack_api.base_url,
+                                    data['plan']['usd']),
                 json={
                     'name': new_data['name'],
                     'amount': new_data['amount']['usd'] * 100
@@ -155,10 +157,12 @@ def test_update_existing_multiple_plans(put_request, get_request, paystack_api,
     mock_get.assert_has_calls(
         [
             call(
-                "{}/plan/{data['plan']['ngn']}".format(paystack_api.base_url),
+                "{}/plan/{}".format(paystack_api.base_url,
+                                    data['plan']['ngn']),
                 headers=headers),
             call(
-                "{}/plan/{data['plan']['usd']}".format(paystack_api.base_url),
+                "{}/plan/{}".format(paystack_api.base_url,
+                                    data['plan']['usd']),
                 headers=headers)
         ],
         any_order=True)
