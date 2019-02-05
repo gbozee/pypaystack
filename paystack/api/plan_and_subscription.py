@@ -34,6 +34,29 @@ class PlanAndSubscription(BaseClass):
             }
         return False, "Could not create plans"
 
+    def update_plans(self, existing_data, new_data):
+        params = [{
+            'plan': existing_data['plan'][x],
+            'name': new_data['name'],
+            'amount': new_data['amount'][x]
+        } for x in existing_data['plan'].keys()]
+        results = [self.update_plan(y) for y in params]
+        if all([x[0] for x in results]):
+            results = [
+                self.get_plan(x) for x in existing_data['plan'].values()
+            ]
+            if all([x[0] for x in results]):
+                data_only = [x[2] for x in results]
+                return True, {
+                    'name': results[0][2]['name'],
+                    'interval': results[0][2]['interval'],
+                    'plan': {
+                        key['currency'].lower(): key['plan_code']
+                        for key in data_only
+                    }
+                }
+        return False, "Could not update plans"
+
     def list_plans(self, params):
         new_params = params.copy()
         if params.get('amount'):

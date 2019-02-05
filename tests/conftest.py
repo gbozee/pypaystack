@@ -24,8 +24,12 @@ def headers(paystack_api):
 @pytest.fixture
 def get_request(mocker):
     def _get_request(*args, **kwargs):
+        side_effect = kwargs.pop('side_effect', None)
         mock_get = mocker.patch('requests.get')
-        mock_get.return_value = MockRequest(*args, **kwargs)
+        if side_effect:
+            mock_get.side_effect = [MockRequest(x) for x in side_effect]
+        else:
+            mock_get.return_value = MockRequest(*args, **kwargs)
         return mock_get
 
     return _get_request
