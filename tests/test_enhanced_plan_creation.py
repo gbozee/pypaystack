@@ -77,6 +77,10 @@ def test_create_plan_multiple_currency(post_request, paystack_api,
         'plan': {
             'ngn': "PLN_gx2wn530m0i3w3m",
             'usd': "PLN_gx2wn530m0i3w3e"
+        },
+        'plan_id': {
+            'ngn': 28,
+            'usd': 29
         }
     }
 
@@ -173,5 +177,9 @@ def test_update_existing_multiple_plans(put_request, get_request, paystack_api,
         'plan': {
             'ngn': "PLN_gx2wn530m0i3w3m",
             'usd': "PLN_gx2wn530m0i3w3e"
+        },
+        'plan_id': {
+            'ngn': 28,
+            'usd': 28
         }
     }

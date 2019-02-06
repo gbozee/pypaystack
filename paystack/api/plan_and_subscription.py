@@ -27,10 +27,12 @@ class PlanAndSubscription(BaseClass):
                 x[2]['currency'].lower(): x[2]['plan_code']
                 for x in results
             }
+            plan_id = {x[2]['currency'].lower(): x[2]['id'] for x in results}
             return True, {
                 'name': data['name'],
                 'plan': plans,
-                'interval': data['interval']
+                'interval': data['interval'],
+                'plan_id': plan_id
             }
         return False, "Could not create plans"
 
@@ -53,7 +55,10 @@ class PlanAndSubscription(BaseClass):
                     'plan': {
                         key['currency'].lower(): key['plan_code']
                         for key in data_only
-                    }
+                    },
+                    'plan_id':
+                    {key['currency'].lower(): key['id']
+                     for key in data_only}
                 }
         return False, "Could not update plans"
 
