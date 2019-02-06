@@ -13,6 +13,84 @@ def test_verify_payment_failed(get_request, paystack_api):
     assert response[1] == "Could not verify transaction"
 
 
+verify_payment_response = {
+    "status": True,
+    "message": "Verification successful",
+    "data": {
+        "amount": 27000,
+        "currency": "NGN",
+        "transaction_date": "2016-10-01T11:03:09.000Z",
+        "status": "success",
+        "reference": "DG4uishudoq90LD",
+        "domain": "test",
+        "metadata": 0,
+        "gateway_response": "Successful",
+        "message": None,
+        "channel": "card",
+        "ip_address": "41.1.25.1",
+        "log": {
+            "time_spent":
+            9,
+            "attempts":
+            1,
+            "authentication":
+            None,
+            "errors":
+            0,
+            "success":
+            True,
+            "mobile":
+            False,
+            "input": [],
+            "channel":
+            None,
+            "history": [{
+                "type":
+                "input",
+                "message":
+                "Filled these fields: card number, card expiry, card cvv",
+                "time":
+                7
+            }, {
+                "type": "action",
+                "message": "Attempted to pay",
+                "time": 7
+            }, {
+                "type": "success",
+                "message": "Successfully paid",
+                "time": 8
+            }, {
+                "type": "close",
+                "message": "Page closed",
+                "time": 9
+            }]
+        },
+        "fees": None,
+        "authorization": {
+            "authorization_code": "AUTH_8dfhjjdt",
+            "card_type": "visa",
+            "last4": "1381",
+            "exp_month": "08",
+            "exp_year": "2018",
+            "bin": "412345",
+            "bank": "TEST BANK",
+            "channel": "card",
+            "signature": "SIG_idyuhgd87dUYSHO92D",
+            "reusable": True,
+            "country_code": "NG"
+        },
+        "customer": {
+            "id": 84312,
+            "customer_code": "CUS_hdhye17yj8qd2tx",
+            "first_name": "BoJack",
+            "last_name": "Horseman",
+            "email": "bojack@horseman.com"
+        },
+        "plan": "PLN_0as2m9n02cl0kp6"
+    }
+}
+
+
 class TestTransactionTestCase(TestCase):
     def setUp(self):
         self.api = PaystackAPI(
@@ -39,82 +117,7 @@ class TestTransactionTestCase(TestCase):
 
     @mock.patch('requests.get')
     def test_verify_payment_success(self, mock_get):
-        response = {
-            "status": True,
-            "message": "Verification successful",
-            "data": {
-                "amount": 27000,
-                "currency": "NGN",
-                "transaction_date": "2016-10-01T11:03:09.000Z",
-                "status": "success",
-                "reference": "DG4uishudoq90LD",
-                "domain": "test",
-                "metadata": 0,
-                "gateway_response": "Successful",
-                "message": None,
-                "channel": "card",
-                "ip_address": "41.1.25.1",
-                "log": {
-                    "time_spent":
-                    9,
-                    "attempts":
-                    1,
-                    "authentication":
-                    None,
-                    "errors":
-                    0,
-                    "success":
-                    True,
-                    "mobile":
-                    False,
-                    "input": [],
-                    "channel":
-                    None,
-                    "history": [{
-                        "type":
-                        "input",
-                        "message":
-                        "Filled these fields: card number, card expiry, card cvv",
-                        "time":
-                        7
-                    }, {
-                        "type": "action",
-                        "message": "Attempted to pay",
-                        "time": 7
-                    }, {
-                        "type": "success",
-                        "message": "Successfully paid",
-                        "time": 8
-                    }, {
-                        "type": "close",
-                        "message": "Page closed",
-                        "time": 9
-                    }]
-                },
-                "fees": None,
-                "authorization": {
-                    "authorization_code": "AUTH_8dfhjjdt",
-                    "card_type": "visa",
-                    "last4": "1381",
-                    "exp_month": "08",
-                    "exp_year": "2018",
-                    "bin": "412345",
-                    "bank": "TEST BANK",
-                    "channel": "card",
-                    "signature": "SIG_idyuhgd87dUYSHO92D",
-                    "reusable": True,
-                    "country_code": "NG"
-                },
-                "customer": {
-                    "id": 84312,
-                    "customer_code": "CUS_hdhye17yj8qd2tx",
-                    "first_name": "BoJack",
-                    "last_name": "Horseman",
-                    "email": "bojack@horseman.com"
-                },
-                "plan": "PLN_0as2m9n02cl0kp6"
-            }
-        }
+        response = verify_payment_response
         code = "1234"
         mock_get.return_value = MockRequest(response)
         result = self.api.transaction_api.verify_payment(code)
@@ -130,6 +133,14 @@ class TestTransactionTestCase(TestCase):
                 "first_name": "BoJack",
                 "last_name": "Horseman",
                 "email": "bojack@horseman.com"
+            })
+        paystack_details = self.api.transaction_api.get_customer_and_auth_details(
+            result[2])
+        self.assertEqual(
+            paystack_details, {
+                'authorization': response['data']['authorization'],
+                'customer': response['data']['customer'],
+                'plan': response['data']['plan']
             })
 
     @mock.patch('requests.post')

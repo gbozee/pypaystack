@@ -5,14 +5,24 @@
 
 <script>
     function payWithPaystack() {
-        var handler = PaystackPop.setup({
+        let currency = "{{currency}}"
+        let plan = "{{plan}}"
+        let obj = {
             key: '{{key}}',
             email: '{{email}}',
-            amount: {{amount }},
-    callback: function (response) {
-        window.location.href = "{{redirect_url}}&trxref=" + response.trxref
-    }
-        });
-    handler.openIframe();
+            amount: {{amount }},      
+            callback: function (response) {
+                window.location.href = "{{redirect_url}}&trxref=" + response.trxref
+            }
+        }      
+        
+        if(Boolean(currency)){
+            obj.currency = currency.toUpperCase()
+        }
+        if(Boolean(plan)){
+            obj.plan = plan
+        }
+        var handler = PaystackPop.setup(obj);
+        handler.openIframe();
     }
 </script>

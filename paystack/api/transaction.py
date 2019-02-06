@@ -68,10 +68,22 @@ class Transaction(BaseClass):
         if response.status_code >= 400:
             return False, "Could not verify transaction"
 
-    def verify_payment(self, code, **kwargs):
+    def verify_payment(self, code, amount_only=True, **kwargs):
         path = "/transaction/verify/{}".format(code)
         response = self.make_request("GET", path)
-        return self.verify_result(response, **kwargs)
+        if amount_only:
+            return self.verify_result(response, **kwargs)
+        # add test for this scenario
+        return self.result_format(response)
+
+    def get_customer_and_auth_details(self, data):
+        if data['status'] == "success":
+            return {
+                'authorization': data['authorization'],
+                'customer': data['customer'],
+                'plan': data['plan']
+            }
+        return {}
 
     def initialize_transaction(self, **kwargs):
         """When we expect paystack to respond back to us once

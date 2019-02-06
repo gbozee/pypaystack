@@ -9,7 +9,15 @@ register = template.Library()
 
 
 @register.inclusion_tag('paystack_button.html', takes_context=True)
-def paystack_button(context, button_id="django-paystack-button", button_class="", amount=None, ref=None, email=None, redirect_url=None):
+def paystack_button(context,
+                    button_id="django-paystack-button",
+                    currency="ngn",
+                    plan="",
+                    button_class="",
+                    amount=None,
+                    ref=None,
+                    email=None,
+                    redirect_url=None):
     new_ref = ref
     new_redirect_url = redirect_url
     new_amount = int(amount) * 100
@@ -26,5 +34,7 @@ def paystack_button(context, button_id="django-paystack-button", button_class=""
         'email': email,
         'amount': new_amount,
         'redirect_url': new_redirect_url,
+        'currency': currency,
+        'plan': plan,
         'js_url': get_js_script()
     }
