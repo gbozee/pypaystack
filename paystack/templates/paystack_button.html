@@ -7,10 +7,12 @@
     function payWithPaystack() {
         let currency = "{{currency}}"
         let plan = "{{plan}}"
+        let ref = "{{ref}}"
         let obj = {
             key: '{{key}}',
             email: '{{email}}',
-            amount: {{amount }},      
+            amount: {{amount }},
+            ref:ref,    
             callback: function (response) {
                 window.location.href = "{{redirect_url}}&trxref=" + response.trxref
             }
@@ -24,5 +26,6 @@
         }
         var handler = PaystackPop.setup(obj);
         handler.openIframe();
+        console.log({currency,plan,ref})
     }
 </script>

@@ -16,9 +16,19 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from django.views.generic import TemplateView
+from dispatch import receiver
+from paystack import signals
+
+
+@receiver(signals.successful_payment_signal)
+def on_successful_payment(sender, **kwargs):
+    import pdb
+    pdb.set_trace()
+    pass
+
 
 urlpatterns = [
-    url(r'^$',TemplateView.as_view(template_name='sample.html'),name='home'),
+    url(r'^$', TemplateView.as_view(template_name='sample.html'), name='home'),
     url(r'^admin/', admin.site.urls),
-    url(r'^paystack/', include('paystack.urls',namespace='paystack'))
+    url(r'^paystack/', include('paystack.urls', namespace='paystack'))
 ]

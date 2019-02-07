@@ -23,6 +23,8 @@ def charge_data(raw_data):
         auth_data['authorization_code'] = auth['authorization_code']
     return {
         'amount': raw_data['amount'] / 100,
+        'status': raw_data['status'],
+        'reference': raw_data['reference'],
         'plan_object': plan,
         'authorization': auth_data,
         'customer': {
