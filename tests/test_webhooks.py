@@ -127,9 +127,13 @@ def test_successful_webhook_signals(mock_generic_fuc, paystack_api):
                 "interval": "hourly",
                 "currency": "NGN"
             },
+            'currency': 'ngn',
+            # 'interval': 'hourly',
+            'status': 'success',
             "authorization": {
                 "authorization_code": "AUTH_f5rnfq9p",
             },
+            'reference': 'qTPrJoy9Bx',
             "customer": {
                 "id": 68324,
                 "email": "bojack@horseman.com",

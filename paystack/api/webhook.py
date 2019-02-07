@@ -10,20 +10,23 @@ def generate_digest(data, secret):
         digestmod=hashlib.sha512).hexdigest()
 
 
-def charge_data(raw_data):
+def charge_data(raw_data, full_auth=False):
     auth_data = {}
     customer = raw_data['customer']
     auth = raw_data.get('authorization')
-    plan = raw_data.get('plan_object', {})
+    plan = raw_data.get('plan_object') or raw_data.get('plan') or {}
     for key in ['send_invoices', 'send_sms', 'description']:
         plan.pop(key, None)
     if plan.get('amount'):
         plan['amount'] = plan['amount'] / 100
     if auth:
         auth_data['authorization_code'] = auth['authorization_code']
+    if full_auth:
+        auth_data = auth
     return {
         'amount': raw_data['amount'] / 100,
         'status': raw_data['status'],
+        'currency': raw_data['currency'].lower(),
         'reference': raw_data['reference'],
         'plan_object': plan,
         'authorization': auth_data,
@@ -53,13 +56,18 @@ class Webhook(object):
     def __init__(self, generate_digest):
         self.secret_key = generate_digest
 
-    def verify(self, unique_code, request_body, use_default=False):
+    def verify(self,
+               unique_code,
+               request_body,
+               use_default=False,
+               full_auth=False):
         digest = generate_digest(request_body, self.secret_key)
         if digest == unique_code:
             payload = json.loads(request_body)
             kwargs = {}
             if payload['event'] == 'charge.success':
-                kwargs['data'] = charge_data(payload['data'])
+                kwargs['data'] = charge_data(
+                    payload['data'], full_auth=full_auth)
             elif payload['event'] in ['transfer.success', 'transfer.failed']:
                 kwargs['data'] = transfer_data(payload['data'])
                 kwargs['transfer_code'] = payload['data']['transfer_code']

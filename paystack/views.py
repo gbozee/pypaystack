@@ -62,7 +62,8 @@ def webhook_view(request):
     PaystackAPI = load_lib()
     paystack_instance = PaystackAPI()
     signature = request.META['HTTP_X_PAYSTACK_SIGNATURE']
-    paystack_instance.webhook_api.verify(signature, request.body)
+    paystack_instance.webhook_api.verify(
+        signature, request.body, full_auth=True)
     # digest = utils.generate_digest(request.body)
     # if digest == signature:
     #     payload = json.loads(request.body)
