@@ -13,7 +13,15 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include
+import django
+
+version = django.get_version().split(".")
+if int(version[0]) >= 2:
+    from django.urls import re_path as url, include
+else:
+    from django.conf.urls import url
+    from django.conf.urls import url, include
+
 from django.contrib import admin
 from django.views.generic import TemplateView
 from dispatch import receiver
@@ -23,12 +31,22 @@ from paystack import signals
 @receiver(signals.successful_payment_signal)
 def on_successful_payment(sender, **kwargs):
     import pdb
+
     pdb.set_trace()
     pass
 
 
+if int(version[0]) > 1:
+    paystack_route = url(
+        "^paystack/", include(("paystack.urls", "paystack"), namespace="paystack")
+    )
+else:
+    paystack_route = (
+        url(r"^paystack/", include("paystack.urls", namespace="paystack")),
+    )
+
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='sample.html'), name='home'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^paystack/', include('paystack.urls', namespace='paystack'))
+    url(r"^$", TemplateView.as_view(template_name="sample.html"), name="home"),
+    url(r"^admin/", admin.site.urls),
+    paystack_route,
 ]
