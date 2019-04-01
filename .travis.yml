@@ -16,8 +16,4 @@ install:
 script:
   - pytest --cov=paystack
   - pytest --cov=django_paystack django_paystack/django_paystack
-  - pip install django==1.11.18
-  - python -c "import django; print(django.get_version())"
-  - pytest --cov=paystack
-  - pytest --cov=django_paystack django_paystack/django_paystack
   
