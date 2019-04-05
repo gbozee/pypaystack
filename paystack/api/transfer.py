@@ -218,7 +218,6 @@ class Transfer(BaseClass):
                     )
                     tasks.append(task)
                 responses = await asyncio.gather(*tasks)
-                print(responses)
                 return responses
 
     def sync_get_transfers_with_filters(self, **kwargs):
