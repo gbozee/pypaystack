@@ -10,4 +10,4 @@ class BaseClass(object):
         result = response.json()
         if callback:
             return callback(result)
-        return result["status"], result["message"], result["data"], request.get("meta")
+        return result["status"], result["message"], result["data"], result.get("meta")
