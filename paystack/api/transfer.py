@@ -4,6 +4,10 @@ import requests_async
 import asyncio
 
 
+class PaystackException(Exception):
+    pass
+
+
 def filter_status(field, status):
     return field["status"] == status
 
@@ -166,7 +170,7 @@ class Transfer(BaseClass):
         result = self.make_request("GET", path)
         data = result.json()
         if not data["status"]:
-            raise Exception("Invalid Key sent.")
+            raise PaystackException("Invalid Key sent.")
         return [
             {"currency": x["currency"], "balance": x["balance"] / 100}
             for x in data.get("data")
@@ -226,7 +230,6 @@ class Transfer(BaseClass):
         result = loop.run_until_complete(future)
         empty_list = [x for x in result if len(x) > 0]
         return [a for b in empty_list for a in b]
-
 
 
 filters = {"r_kind": "recipient_name", "recipient": "Abiola Oyeniyi"}
