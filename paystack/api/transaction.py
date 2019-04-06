@@ -141,6 +141,7 @@ class Transaction(BaseClass):
 
     def get_transactions(self,
                          perPage=50,
+                         page=None,
                          customer_id=None,
                          status=None,
                          _from=None,
@@ -151,7 +152,8 @@ class Transaction(BaseClass):
                 'status': status,
                 'customer': customer_id,
                 'from': _from,
-                'to': _to
+                'to': _to,
+                'page': page
         }.items():
             if value:
                 if key == 'amount':
