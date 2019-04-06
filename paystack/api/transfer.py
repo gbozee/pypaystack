@@ -1,6 +1,5 @@
 from .base import BaseClass
 from dateutil import parser
-import requests_async
 import asyncio
 
 
@@ -176,7 +175,6 @@ class Transfer(BaseClass):
             for x in data.get("data")
         ]
 
-    async def get_transfers(self, perPage=50, page=1, session=requests_async):
         params = {"perPage": perPage, "page": page}
         path = "/transfer"
         response = await self.async_make_request("GET", path, session, params=params)
@@ -190,6 +188,7 @@ class Transfer(BaseClass):
 
     async def get_transfers_with_filters(
         self,
+        request_async,
         perPage=100,
         recipient=None,
         r_kind=None,

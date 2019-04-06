@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name="django-paystack",
-    version="0.9.3",
+    version="0.9.4",
     packages=find_packages(),
     include_package_data=True,
     license="MIT License",  # example license
@@ -24,7 +24,6 @@ setup(
         "Paperboy",
         "python-dateutil",
         # "requests-async",
-        "requests-async @ https://github.com/encode/requests-async/archive/master.zip",
     ],
     # dependency_links=[
         # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
