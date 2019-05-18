@@ -96,7 +96,7 @@ _Optional_
 
 the template tag `paystack_button` takes the following argument
 
-`button_style`: css class to style the button
+`button_class`: css class to style the button
 
 `button_id`: id name for the button: default is "django-paystack-button"
 
