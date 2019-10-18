@@ -25,7 +25,7 @@ else:
 from django.contrib import admin
 from django.views.generic import TemplateView
 from dispatch import receiver
-from paystack import signals
+from paystack.api import signals
 
 
 @receiver(signals.successful_payment_signal)
@@ -38,11 +38,15 @@ def on_successful_payment(sender, **kwargs):
 
 if int(version[0]) > 1:
     paystack_route = url(
-        "^paystack/", include(("paystack.urls", "paystack"), namespace="paystack")
+        "^paystack/",
+        include(("paystack.frameworks.django.urls", "paystack"), namespace="paystack"),
     )
 else:
     paystack_route = (
-        url(r"^paystack/", include("paystack.urls", namespace="paystack")),
+        url(
+            r"^paystack/",
+            include("paystack.frameworks.django.urls", namespace="paystack"),
+        ),
     )
 
 urlpatterns = [
