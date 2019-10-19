@@ -135,6 +135,18 @@ class Transfer(BaseClass):
         req = self.make_request("GET", "/transfer/" + transfer_recipient)
         return self.result_format(req)
 
+    def get_banks(self):
+        """Fetch the list of banks supported by paystack"""
+        req = self.make_request("GET", "/bank")
+        return self.result_format(req)
+
+    def get_bank(self, bank_name):
+        result = self.get_banks()
+        if len(result) > 2:
+            instance = [x for x in result[2] if bank_name.lower() in x["name"].lower()]
+            if instance:
+                return instance[0]
+
     def get_bank_code(self, bank_name):
         options = {
             "Citibank": "023",

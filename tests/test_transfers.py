@@ -325,3 +325,32 @@ class TestTransferTestCase(TestCase):
         )
         result = self.api.transfer_api.check_balance()
         self.assertEqual(result, [{"currency": "NGN", "balance": 1231200}])
+
+    @mock.patch("requests.get")
+    def test_get_banks(self, mock_get):
+        response = [
+            {
+                "name": "Access Bank",
+                "slug": "access-bank",
+                "code": "044",
+                "longcode": "044150149",
+                "gateway": "emandate",
+                "pay_with_bank": False,
+                "active": True,
+                "is_deleted": None,
+                "country": "Nigeria",
+                "currency": "NGN",
+                "type": "nuban",
+                "id": 1,
+                "createdAt": "2016-07-14T10:04:29.000Z",
+                "updatedAt": "2019-06-18T10:52:46.000Z",
+            }
+        ]
+        mock_get.return_value = MockRequest(
+            {"status": True, "message": "Banks retrieved", "data": response}
+        )
+        result = self.api.transfer_api.get_banks()
+        self.assertEqual(result[2], response)
+        bank_info = self.api.transfer_api.get_bank("Access Bank")
+        assert bank_info == response[0]
+
