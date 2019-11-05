@@ -3,11 +3,11 @@ import pytest
 from unittest import TestCase, mock
 from paystack.utils import PaystackAPI, MockRequest
 
-PAYSTACK_API_URL = 'https://api.paystack.co'
+PAYSTACK_API_URL = "https://api.paystack.co"
 
 
 def test_verify_payment_failed(get_request, paystack_api):
-    get_request({"status": False, 'message': "Invalid key"}, status_code=400)
+    get_request({"status": False, "message": "Invalid key"}, status_code=400)
     response = paystack_api.verify_payment("1234", amount=20000)
     assert not response[0]
     assert response[1] == "Could not verify transaction"
@@ -29,41 +29,24 @@ verify_payment_response = {
         "channel": "card",
         "ip_address": "41.1.25.1",
         "log": {
-            "time_spent":
-            9,
-            "attempts":
-            1,
-            "authentication":
-            None,
-            "errors":
-            0,
-            "success":
-            True,
-            "mobile":
-            False,
+            "time_spent": 9,
+            "attempts": 1,
+            "authentication": None,
+            "errors": 0,
+            "success": True,
+            "mobile": False,
             "input": [],
-            "channel":
-            None,
-            "history": [{
-                "type":
-                "input",
-                "message":
-                "Filled these fields: card number, card expiry, card cvv",
-                "time":
-                7
-            }, {
-                "type": "action",
-                "message": "Attempted to pay",
-                "time": 7
-            }, {
-                "type": "success",
-                "message": "Successfully paid",
-                "time": 8
-            }, {
-                "type": "close",
-                "message": "Page closed",
-                "time": 9
-            }]
+            "channel": None,
+            "history": [
+                {
+                    "type": "input",
+                    "message": "Filled these fields: card number, card expiry, card cvv",
+                    "time": 7,
+                },
+                {"type": "action", "message": "Attempted to pay", "time": 7},
+                {"type": "success", "message": "Successfully paid", "time": 8},
+                {"type": "close", "message": "Page closed", "time": 9},
+            ],
         },
         "fees": None,
         "authorization": {
@@ -77,17 +60,17 @@ verify_payment_response = {
             "channel": "card",
             "signature": "SIG_idyuhgd87dUYSHO92D",
             "reusable": True,
-            "country_code": "NG"
+            "country_code": "NG",
         },
         "customer": {
             "id": 84312,
             "customer_code": "CUS_hdhye17yj8qd2tx",
             "first_name": "BoJack",
             "last_name": "Horseman",
-            "email": "bojack@horseman.com"
+            "email": "bojack@horseman.com",
         },
-        "plan": "PLN_0as2m9n02cl0kp6"
-    }
+        "plan": "PLN_0as2m9n02cl0kp6",
+    },
 }
 
 
@@ -97,25 +80,24 @@ class TestTransactionTestCase(TestCase):
             public_key="public_key",
             secret_key="secret_key",
             django=False,
-            base_url=PAYSTACK_API_URL)
+            base_url=PAYSTACK_API_URL,
+        )
         self.headers = {
-            'Authorization': "Bearer {}".format(self.api.secret_key),
-            'Content-Type': 'application/json'
+            "Authorization": "Bearer {}".format(self.api.secret_key),
+            "Content-Type": "application/json",
         }
 
-    @mock.patch('requests.get')
+    @mock.patch("requests.get")
     def test_verify_payment_failed(self, mock_get):
         mock_get.return_value = MockRequest(
-            {
-                "status": False,
-                'message': "Invalid key"
-            }, status_code=400)
-        response = self.api.transaction_api.verify_payment(
-            "1234", amount=20000)
+            {"status": False, "message": "Invalid key"}, status_code=400
+        )
+        response = self.api.transaction_api.verify_payment("1234", amount=20000)
         self.assertFalse(response[0])
         self.assertEqual(response[1], "Could not verify transaction")
 
-    @mock.patch('requests.get')
+    
+    @mock.patch("requests.get")
     def test_verify_payment_success(self, mock_get):
         response = verify_payment_response
         code = "1234"
@@ -123,27 +105,33 @@ class TestTransactionTestCase(TestCase):
         result = self.api.transaction_api.verify_payment(code)
         mock_get.assert_called_once_with(
             "{}/transaction/verify/{}".format(self.api.base_url, code),
-            headers=self.headers)
+            headers=self.headers,
+        )
         self.assertTrue(result[0])
         self.assertEqual(result[1], "Verification successful")
         self.assertEqual(
-            result[2]['customer'], {
+            result[2]["customer"],
+            {
                 "id": 84312,
                 "customer_code": "CUS_hdhye17yj8qd2tx",
                 "first_name": "BoJack",
                 "last_name": "Horseman",
-                "email": "bojack@horseman.com"
-            })
+                "email": "bojack@horseman.com",
+            },
+        )
         paystack_details = self.api.transaction_api.get_customer_and_auth_details(
-            result[2])
+            result[2]
+        )
         self.assertEqual(
-            paystack_details, {
-                'authorization': response['data']['authorization'],
-                'customer': response['data']['customer'],
-                'plan': response['data']['plan']
-            })
+            paystack_details,
+            {
+                "authorization": response["data"]["authorization"],
+                "customer": response["data"]["customer"],
+                "plan": response["data"]["plan"],
+            },
+        )
 
-    @mock.patch('requests.post')
+    @mock.patch("requests.post")
     def test_recurrent_charge_success_valid(self, mock_post):
         result = {
             "status": True,
@@ -174,38 +162,40 @@ class TestTransactionTestCase(TestCase):
                     "country_code": "NG",
                     "brand": "visa",
                     "reusable": True,
-                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4"
+                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4",
                 },
                 "customer": {
                     "id": 90831,
                     "customer_code": "CUS_fxg9930u8pqeiu",
                     "first_name": "Bojack",
                     "last_name": "Horseman",
-                    "email": "bojack@horsinaround.com"
+                    "email": "bojack@horsinaround.com",
                 },
-                "plan": 0
-            }
+                "plan": 0,
+            },
         }
         mock_post.return_value = MockRequest(result)
         json_data = dict(
             authorization_code="AUTH_5z72ux0koz",
             email="bojack@horsinaround.com",
-            amount=5000)
+            amount=5000,
+        )
         response = self.api.transaction_api.recurrent_charge(**json_data)
         mock_post.assert_called_once_with(
             "{}/transaction/charge_authorization".format(self.api.base_url),
             json={
-                "authorization_code": json_data['authorization_code'],
-                'email': json_data['email'],
-                'amount': json_data['amount'] * 100
+                "authorization_code": json_data["authorization_code"],
+                "email": json_data["email"],
+                "amount": json_data["amount"] * 100,
             },
-            headers=self.headers)
+            headers=self.headers,
+        )
         self.assertTrue(response[0])
-        self.assertEqual(response[1], result['message'])
-        self.assertEqual(response[2], result['data'])
-        self.assertEqual(response[2]['status'], 'success')
+        self.assertEqual(response[1], result["message"])
+        self.assertEqual(response[2], result["data"])
+        self.assertEqual(response[2]["status"], "success")
 
-    @mock.patch('requests.post')
+    @mock.patch("requests.post")
     def test_recurrent_charge_success_invalid(self, mock_post):
         result = {
             "status": True,
@@ -236,81 +226,83 @@ class TestTransactionTestCase(TestCase):
                     "country_code": "NG",
                     "brand": "visa",
                     "reusable": True,
-                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4"
+                    "signature": "SIG_ZdUx7Z5ujd75rt9OMTN4",
                 },
                 "customer": {
                     "id": 84312,
                     "customer_code": "CUS_hdhye17yj8qd2tx",
                     "first_name": "BoJack",
                     "last_name": "Horseman",
-                    "email": "bojack@horseman.com"
+                    "email": "bojack@horseman.com",
                 },
-                "plan": "PLN_0as2m9n02cl0kp6"
-            }
+                "plan": "PLN_0as2m9n02cl0kp6",
+            },
         }
         mock_post.return_value = MockRequest(result)
         json_data = dict(
             authorization_code="AUTH_5z72ux0koz",
             email="bojack@horsinaround.com",
-            amount=5000)
+            amount=5000,
+        )
         response = self.api.transaction_api.recurrent_charge(**json_data)
         mock_post.assert_called_once_with(
             "{}/transaction/charge_authorization".format(self.api.base_url),
             json={
-                "authorization_code": json_data['authorization_code'],
-                'email': json_data['email'],
-                'amount': json_data['amount'] * 100
+                "authorization_code": json_data["authorization_code"],
+                "email": json_data["email"],
+                "amount": json_data["amount"] * 100,
             },
-            headers=self.headers)
+            headers=self.headers,
+        )
         self.assertTrue(response[0])
-        self.assertEqual(response[1], result['message'])
-        self.assertEqual(response[2], result['data'])
-        self.assertEqual(response[2]['status'], 'failed')
+        self.assertEqual(response[1], result["message"])
+        self.assertEqual(response[2], result["data"])
+        self.assertEqual(response[2]["status"], "failed")
 
-    @mock.patch('requests.post')
+    @mock.patch("requests.post")
     def test_recurrent_charge_success_failed(self, mock_post):
         mock_post.return_value = MockRequest(
-            {
-                "status": False,
-                "message": "Invalid key"
-            }, status_code=400)
+            {"status": False, "message": "Invalid key"}, status_code=400
+        )
         json_data = dict(
             authorization_code="AUTH_5z72ux0koz",
             email="bojack@horsinaround.com",
-            amount=5000)
+            amount=5000,
+        )
         result = self.api.transaction_api.recurrent_charge(**json_data)
         self.assertFalse(result[0])
         self.assertEqual(result[1], "Invalid key")
 
-    @mock.patch('requests.post')
+    @mock.patch("requests.post")
     def test_initialize_transaction_success(self, mock_post):
         result = {
             "status": True,
             "message": "Authorization URL created",
             "data": {
-                "authorization_url":
-                "https://checkout.paystack.com/0peioxfhpn",
+                "authorization_url": "https://checkout.paystack.com/0peioxfhpn",
                 "access_code": "0peioxfhpn",
-                "reference": "7PVGX8MEk85tgeEpVDtD"
-            }
+                "reference": "7PVGX8MEk85tgeEpVDtD",
+            },
         }
         mock_post.return_value = MockRequest(result)
         json_data = {
-            'reference': "7PVGX8MEk85tgeEpVDtD",
-            'email': 'james@example.com',
-            'amount': 20000,
-            'callback_url': "http://example.com"
+            "reference": "7PVGX8MEk85tgeEpVDtD",
+            "email": "james@example.com",
+            "amount": 20000,
+            "callback_url": "http://example.com",
         }
         response = self.api.transaction_api.initialize_transaction(**json_data)
         mock_post.assert_called_once_with(
             "{}/transaction/initialize".format(self.api.base_url),
             json={
-                "reference": json_data['reference'],
-                'email': json_data['email'],
-                'amount': json_data['amount'] * 100,
-                'callback_url': json_data['callback_url']
+                "reference": json_data["reference"],
+                "email": json_data["email"],
+                "amount": json_data["amount"] * 100,
+                "callback_url": json_data["callback_url"],
             },
-            headers=self.headers)
+            headers=self.headers,
+        )
         self.assertTrue(response[0])
-        self.assertEqual(response[1], result['message'])
-        self.assertEqual(response[2], result['data'])
+        self.assertEqual(response[1], result["message"])
+        self.assertEqual(response[2], result["data"])
+
