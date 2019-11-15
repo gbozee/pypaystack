@@ -61,6 +61,7 @@ def build_app(
         public_key=str(PAYSTACK_PUBLIC_KEY),
         secret_key=str(PAYSTACK_SECRET_KEY),
         base_url=str(PAYSTACK_API_URL),
+        django=False,
     )
     if _app:
         app = _app
