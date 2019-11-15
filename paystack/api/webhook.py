@@ -10,7 +10,9 @@ def generate_digest(data, secret):
     ).hexdigest()
 
 
-def charge_data(raw_data, full_auth=False):
+def charge_data(raw_data, full_auth=False, full=False):
+    if full:
+        return raw_data
     auth_data = {}
     customer = raw_data["customer"]
     auth = raw_data.get("authorization")
@@ -39,7 +41,9 @@ def charge_data(raw_data, full_auth=False):
     }
 
 
-def transfer_data(raw_data):
+def transfer_data(raw_data, full=False):
+    if full:
+        return raw_data
     result = {
         "amount": raw_data["amount"] / 100,
         "recipient": {"recipient_code": raw_data["recipient"]["recipient_code"]},
@@ -54,15 +58,19 @@ class Webhook(object):
     def __init__(self, generate_digest):
         self.secret_key = generate_digest
 
-    def verify(self, unique_code, request_body, use_default=False, full_auth=False):
+    def verify(
+        self, unique_code, request_body, use_default=False, full_auth=False, full=False
+    ):
         digest = generate_digest(request_body, self.secret_key)
         if digest == unique_code:
             payload = json.loads(request_body)
             kwargs = {}
             if payload["event"] == "charge.success":
-                kwargs["data"] = charge_data(payload["data"], full_auth=full_auth)
+                kwargs["data"] = charge_data(
+                    payload["data"], full_auth=full_auth, full=full
+                )
             elif payload["event"] in ["transfer.success", "transfer.failed"]:
-                kwargs["data"] = transfer_data(payload["data"])
+                kwargs["data"] = transfer_data(payload["data"], full=full)
                 kwargs["transfer_code"] = payload["data"]["transfer_code"]
             else:
                 kwargs = {"event": payload["event"], "data": payload["data"]}

@@ -35,18 +35,22 @@ def verify_payment(
     return response_callback(response[0], order=order)
 
 
-async def webhook_view(request: Request, paystack_instance=None):
+async def webhook_view(request: Request, paystack_instance=None, full=True):
     signature = request.headers.get("x-paystack-signature")
     body = await request.body()
     return JSONResponse(
         {"status": "Success"},
         background=BackgroundTask(
-            paystack_instance.webhook_api.verify, signature, body, full_auth=True
+            paystack_instance.webhook_api.verify,
+            signature,
+            body,
+            full_auth=True,
+            full=full,
         ),
     )
 
 
-def build_app(PaystackAPI, response_callback=None):
+def build_app(PaystackAPI, response_callback=None, full_event=False):
     app = Starlette()
     paystack_instance = PaystackAPI(
         public_key=str(PAYSTACK_PUBLIC_KEY),
@@ -58,7 +62,9 @@ def build_app(PaystackAPI, response_callback=None):
     )
 
     async def new_webhook(request):
-        return await webhook_view(request, paystack_instance=paystack_instance)
+        return await webhook_view(
+            request, paystack_instance=paystack_instance, full=full_event
+        )
 
     # new_webhook = lambda request: expression asyncio.coroutine(
     #     functools.partial(webhook_view, paystack_instance=paystack_instance)
