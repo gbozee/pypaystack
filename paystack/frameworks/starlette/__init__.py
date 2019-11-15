@@ -50,16 +50,28 @@ async def webhook_view(request: Request, paystack_instance=None, full=True):
     )
 
 
-def build_app(PaystackAPI, root_path="", response_callback=None, full_event=False):
-    app = Starlette()
+def build_app(
+    PaystackAPI,
+    root_path="",
+    response_callback=None,
+    full_event=False,
+    _app: Starlette = None,
+):
     paystack_instance = PaystackAPI(
         public_key=str(PAYSTACK_PUBLIC_KEY),
         secret_key=str(PAYSTACK_SECRET_KEY),
         base_url=str(PAYSTACK_API_URL),
     )
-    app.add_middleware(
-        CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
-    )
+    if _app:
+        app = _app
+    else:
+        app = Starlette()
+        app.add_middleware(
+            CORSMiddleware,
+            allow_origins=["*"],
+            allow_methods=["*"],
+            allow_headers=["*"],
+        )
 
     async def new_webhook(request):
         return await webhook_view(
