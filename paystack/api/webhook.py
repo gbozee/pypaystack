@@ -59,12 +59,17 @@ class Webhook(object):
         self.secret_key = generate_digest
 
     def verify(
-        self, unique_code, request_body, use_default=False, full_auth=False, full=False
+        self,
+        unique_code,
+        request_body,
+        use_default=False,
+        full_auth=False,
+        full=False,
+        **kwargs
     ):
         digest = generate_digest(request_body, self.secret_key)
         if digest == unique_code:
             payload = json.loads(request_body)
-            kwargs = {}
             if payload["event"] == "charge.success":
                 kwargs["data"] = charge_data(
                     payload["data"], full_auth=full_auth, full=full

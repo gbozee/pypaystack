@@ -3,15 +3,14 @@ import functools
 import importlib
 
 from starlette.applications import Starlette
+from starlette.background import BackgroundTask
+from starlette.config import Config
+from starlette.datastructures import URL, Secret
 from starlette.middleware.cors import CORSMiddleware
 from starlette.requests import Request
-from starlette.background import BackgroundTask
 from starlette.responses import JSONResponse, RedirectResponse
 
 from paystack.api import signals
-
-from starlette.config import Config
-from starlette.datastructures import URL, Secret
 
 config = Config(".env")
 
@@ -38,6 +37,7 @@ def verify_payment(
 async def webhook_view(request: Request, paystack_instance=None, full=True):
     signature = request.headers.get("x-paystack-signature")
     body = await request.body()
+    loop = asyncio.get_running_loop()
     return JSONResponse(
         {"status": "Success"},
         background=BackgroundTask(
@@ -46,6 +46,7 @@ async def webhook_view(request: Request, paystack_instance=None, full=True):
             body,
             full_auth=True,
             full=full,
+            loop=loop,
         ),
     )
 
