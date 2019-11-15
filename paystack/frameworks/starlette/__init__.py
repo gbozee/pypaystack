@@ -50,7 +50,7 @@ async def webhook_view(request: Request, paystack_instance=None, full=True):
     )
 
 
-def build_app(PaystackAPI, response_callback=None, full_event=False):
+def build_app(PaystackAPI, root_path="", response_callback=None, full_event=False):
     app = Starlette()
     paystack_instance = PaystackAPI(
         public_key=str(PAYSTACK_PUBLIC_KEY),
@@ -69,12 +69,14 @@ def build_app(PaystackAPI, response_callback=None, full_event=False):
     # new_webhook = lambda request: expression asyncio.coroutine(
     #     functools.partial(webhook_view, paystack_instance=paystack_instance)
     # )
-    app.add_route("/webhook", new_webhook, methods=["POST"])
+    app.add_route(root_path + "/webhook", new_webhook, methods=["POST"])
     new_verify_payment = lambda request: verify_payment(
         request,
         response_callback=response_callback,
         paystack_instance=paystack_instance,
         PaystackAPI=PaystackAPI,
     )
-    app.add_route("/verify-payment/{order_id}", new_verify_payment, methods=["GET"])
+    app.add_route(
+        root_path + "/verify-payment/{order_id}", new_verify_payment, methods=["GET"]
+    )
     return app
