@@ -34,20 +34,12 @@ def verify_payment(
     return response_callback(response[0], order=order)
 
 
-async def webhook_view(request: Request, paystack_instance=None, full=True):
+async def webhook_view(request: Request, background_action=None, **kwargs):
     signature = request.headers.get("x-paystack-signature")
     body = await request.body()
-    loop = asyncio.get_running_loop()
     return JSONResponse(
         {"status": "Success"},
-        background=BackgroundTask(
-            paystack_instance.webhook_api.verify,
-            signature,
-            body,
-            full_auth=True,
-            full=full,
-            loop=loop,
-        ),
+        background=BackgroundTask(background_action, signature, body, **kwargs),
     )
 
 
@@ -55,7 +47,7 @@ def build_app(
     PaystackAPI,
     root_path="",
     response_callback=None,
-    full_event=False,
+    post_webhook_processing=None,
     _app: Starlette = None,
 ):
     paystack_instance = PaystackAPI(
@@ -75,14 +67,20 @@ def build_app(
             allow_headers=["*"],
         )
 
-    async def new_webhook(request):
-        return await webhook_view(
-            request, paystack_instance=paystack_instance, full=full_event
+    def background_action(signature, body):
+        return paystack_instance.webhook_api.verify(
+            signature, body, full_auth=True, full=False, loop=loop
         )
 
-    # new_webhook = lambda request: expression asyncio.coroutine(
-    #     functools.partial(webhook_view, paystack_instance=paystack_instance)
-    # )
+    verify_action = post_webhook_processing or background_action
+
+    async def new_webhook(request):
+        return await webhook_view(
+            request,
+            background_action=verify_action,
+            paystack_instance=paystack_instance,
+        )
+
     app.add_route(root_path + "/webhook", new_webhook, methods=["POST"])
     new_verify_payment = lambda request: verify_payment(
         request,
