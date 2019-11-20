@@ -9,7 +9,7 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name="pypaystack",
-    version="1.0.6",
+    version="1.0.7",
     packages=find_packages(),
     include_package_data=True,
     license="MIT License",  # example license
@@ -26,12 +26,9 @@ setup(
         # "requests-async",
         "requests-async @ https://github.com/encode/requests-async/archive/master.zip",
     ],
-    extras_require={
-        "django": ["django>=2.0",],
-        "starlette": ["starlette",],
-    },
+    extras_require={"django": ["django>=2.0"], "starlette": ["starlette==0.12.13"]},
     # dependency_links=[
-        # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
+    # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
     # ],
     classifiers=[
         "Environment :: Web Environment",

@@ -91,6 +91,17 @@ class Transfer(BaseClass):
         req = self.make_request("POST", path, json=json)
         return self.result_format(req)
 
+    def create_transfer_code(self, recipient_code, amount, reason=""):
+        data = self.initialize_transfer(amount, recipient_code, reason)
+        return self._transfer_response(data)
+
+    def _transfer_response(self, result):
+        if len(result) == 3:
+            transfer_code = result[2]["transfer_code"]
+            msg = result[1]
+            return transfer_code, msg
+        return None, None
+
     def bulk_transfer(self, array_of_recipient_with_amount):
         transform = [
             {"amount": x["amount"] * 100, "recipient": x["recipient"]}

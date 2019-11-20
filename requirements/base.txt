@@ -2,3 +2,6 @@ certifi==2017.7.27.1
 django>=2.0
 pytz==2017.2 
 requests==2.20.0 
+starlette==0.12.10
+jinja2==2.10.3
+aiofiles==0.4.0

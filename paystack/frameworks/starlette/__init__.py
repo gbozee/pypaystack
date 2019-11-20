@@ -91,4 +91,5 @@ def build_app(
     app.add_route(
         root_path + "/verify-payment/{order_id}", new_verify_payment, methods=["GET"]
     )
+    app.state.paystack = paystack_instance
     return app
