@@ -1,0 +1,8 @@
+<h3>Banks</h3>
+
+{% for bank in banks %}
+ <ul>
+ 	<li> <a href="{% url 'paystack:bankdetail' bank.id %}">{{bank.name}} <br> {{bank.country}}</a></li>
+ </ul>	
+
+{% endfor %}

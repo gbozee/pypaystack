@@ -3,6 +3,9 @@ from django.views.decorators.csrf import csrf_exempt
 
 from . import settings
 from . import views
+from django.urls import path
+
+app_name= 'paystack'
 urlpatterns = [
     url(r'^verify-payment/(?P<order>[\w.@+-]+)/$',
         views.verify_payment, name='verify_payment'),
@@ -16,4 +19,6 @@ urlpatterns = [
     url(r'^success-page/$',
         views.TemplateView.as_view(template_name='paystack/success-page.html'), name='success_page'),
     url(r'^webhook/$', csrf_exempt(views.webhook_view), name='webhook'),
+    url(r'^banklist/$', views.banklist,name='banklist'),
+    path('bankdetail/<int:bank_id>', views.bankdetail,name='bankdetail'),
 ]
