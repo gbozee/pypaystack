@@ -12,6 +12,8 @@ from .signals import payment_verified
 from .utils import load_lib
 from django.contrib import messages
 from django.dispatch import receiver
+import json
+import requests
 
 
 def verify_payment(request, order):
@@ -67,3 +69,26 @@ def webhook_view(request):
         signals.event_signal.send(
             sender=request, event=payload['event'], data=payload['data'])
     return JsonResponse({'status': "Success"})
+
+def banklist(request):
+    response = requests.get("https://api.paystack.co/bank?gateway=emandate&pay_with_bank=true")
+    if response.status_code == 200:
+        result = response.json()
+        banks = result['data']
+        context = {'banks':banks}
+        return render(request,'paystack/banklist.html',context)
+
+
+
+def bankdetail(request, bank_id):
+    response = requests.get("https://api.paystack.co/bank?gateway=emandate&pay_with_bank=true")
+    if response.status_code == 200:
+        result = response.json()
+        banks = result['data']
+        for bank in banks:
+            if bank['id'] == bank_id:
+                bank_detail = bank
+            else:
+                error = 'bank not found'    
+        context = {'bank_detail':bank_detail,'error':error}
+        return render(request,'paystack/bankdetail.html',context)            
