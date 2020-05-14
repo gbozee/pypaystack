@@ -62,7 +62,7 @@ PAYSTACK_SECRET_KEY=******
 6. A `signal` is provided with the verified  reference as well as the amount
 
 ```
-from hubspot.signals import payment_verified
+from paystack.signals import payment_verified
 
 from django.dispatch import receiver
 
