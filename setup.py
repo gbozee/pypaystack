@@ -24,7 +24,7 @@ setup(
         "Paperboy",
         "python-dateutil",
         # "requests-async",
-        "requests-async @ https://github.com/encode/requests-async/archive/master.zip",
+        # "requests-async @ https://github.com/encode/requests-async/archive/master.zip",
     ],
     # dependency_links=[
         # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
