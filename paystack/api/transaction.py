@@ -4,15 +4,15 @@ from .base import BaseClass
 class Customer(BaseClass):
     def create_customer(self, data):
         path = "/customer"
-        response = self.make_request('POST', path, json=data)
+        response = self.make_request("POST", path, json=data)
         # return self.result_format(response)
         if response.status_code >= 400:
             return None
-        return response.json()['data']['customer_code']
+        return response.json()["data"]["customer_code"]
 
     def n_create_customer(self, data):
         path = "/customer"
-        response = self.make_request('POST', path, json=data)
+        response = self.make_request("POST", path, json=data)
         return self.result_format(response)
         # if response.status_code >= 400:
         #     return None
@@ -20,35 +20,35 @@ class Customer(BaseClass):
 
     def list_customer(self, data):
         path = "/customer"
-        response = self.make_request('GET', path, params=data)
+        response = self.make_request("GET", path, params=data)
         return self.result_format(response)
 
     def get_customer(self, customer_email):
         path = "/customer/{}".format(customer_email)
-        response = self.make_request('GET', path)
+        response = self.make_request("GET", path)
         return self.result_format(response)
 
     def update_customer(self, customer_code, data):
-        path = '/customer/{}'.format(customer_code)
-        response = self.make_request('PUT', path, json=data)
+        path = "/customer/{}".format(customer_code)
+        response = self.make_request("PUT", path, json=data)
         return self.result_format(response)
 
     def blacklist_customer(self, customer_code, blacklist=True):
         data = {
-            'customer': customer_code,
-            'risk_action': 'deny' if blacklist else "allow"
+            "customer": customer_code,
+            "risk_action": "deny" if blacklist else "allow",
         }
         path = "/customer/set_risk_action"
-        response = self.make_request('POST', path, json=data)
+        response = self.make_request("POST", path, json=data)
         return self.result_format(response)
 
     def deactivate_auth(self, authorization_code):
-        data = {'authorization_code': authorization_code}
+        data = {"authorization_code": authorization_code}
         path = "/customer/deactivate_authorization"
-        response = self.make_request('POST', path, json=data)
+        response = self.make_request("POST", path, json=data)
 
         def callback(dd):
-            return dd['status'], dd['message']
+            return dd["status"], dd["message"]
 
         return self.result_format(response, callback)
 
@@ -77,11 +77,11 @@ class Transaction(BaseClass):
         return self.result_format(response)
 
     def get_customer_and_auth_details(self, data):
-        if data['status'] == "success":
+        if data["status"] == "success":
             return {
-                'authorization': data['authorization'],
-                'customer': data['customer'],
-                'plan': data['plan']
+                "authorization": data["authorization"],
+                "customer": data["customer"],
+                "plan": data["plan"],
             }
         return {}
 
@@ -98,12 +98,12 @@ class Transaction(BaseClass):
         """
         path = "/transaction/initialize"
         json_data = {
-            'reference': kwargs['reference'],
-            'email': kwargs['email'],
-            'amount': kwargs['amount'] * 100,
-            'callback_url': kwargs['callback_url']
+            "reference": kwargs["reference"],
+            "email": kwargs["email"],
+            "amount": kwargs["amount"] * 100,
+            "callback_url": kwargs["callback_url"],
         }
-        response = self.make_request('POST', path, json=json_data)
+        response = self.make_request("POST", path, json=json_data)
         return self.result_format(response)
 
     def recurrent_charge(self, **kwargs):
@@ -116,11 +116,11 @@ class Transaction(BaseClass):
         """
         path = "/transaction/charge_authorization"
         json_data = {
-            'authorization_code': kwargs['authorization_code'],
-            'email': kwargs['email'],
-            'amount': kwargs['amount'] * 100
+            "authorization_code": kwargs["authorization_code"],
+            "email": kwargs["email"],
+            "amount": kwargs["amount"] * 100,
         }
-        response = self.make_request('POST', path, json=json_data)
+        response = self.make_request("POST", path, json=json_data)
         return self.result_format(response)
 
     def check_authorization(self, **kwargs):
@@ -132,34 +132,39 @@ class Transaction(BaseClass):
         }"""
         path = "/transaction/check_authorization"
         json_data = {
-            'authorization_code': kwargs['authorization_code'],
-            'email': kwargs['email'],
-            'amount': kwargs['amount'] * 100
+            "authorization_code": kwargs["authorization_code"],
+            "email": kwargs["email"],
+            "amount": kwargs["amount"] * 100,
         }
-        response = self.make_request('POST', path, json=json_data)
+        response = self.make_request("POST", path, json=json_data)
         return self.result_format(response)
 
-    def get_transactions(self,
-                         perPage=50,
-                         page=None,
-                         customer_id=None,
-                         status=None,
-                         _from=None,
-                         _to=None,
-                         amount=None):
-        params = {'perPage': perPage}
+    def get_transactions(
+        self,
+        perPage=50,
+        page=None,
+        customer_id=None,
+        status=None,
+        _from=None,
+        _to=None,
+        amount=None,
+    ):
+        params = {"perPage": perPage}
         for key, value in {
-                'status': status,
-                'customer': customer_id,
-                'from': _from,
-                'to': _to,
-                'page': page
+            "status": status,
+            "customer": customer_id,
+            "from": _from,
+            "to": _to,
+            "page": page,
         }.items():
             if value:
-                if key == 'amount':
+                if key == "amount":
                     params[key] = value * 100
                 else:
                     params[key] = value
         path = "/transaction"
-        response = self.make_request('GET', path, params=params)
+        response = self.make_request("GET", path, params=params)
         return self.result_format(response)
+
+    def build_transaction_obj(self, currency="ngn", **kwargs):
+        pass

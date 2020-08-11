@@ -61,6 +61,17 @@ class PaystackAPI(object):
             self.secret_key.encode("utf-8"), msg=data, digestmod=hashlib.sha512
         ).hexdigest()
 
+    def processor_info(self, amount, redirect_url=None):
+        return {
+            "amount": float("%.2f"%amount),
+            "js_script": get_js_script(),
+            "key": self.public_key,
+            "redirect_url": redirect_url
+        }
+
+    def other_payment_info(self, **kwargs):
+        return self.transaction_api.build_transaction_obj(**kwargs)
+
 
 def load_lib(config=None):
     """
