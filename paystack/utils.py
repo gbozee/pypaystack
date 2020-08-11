@@ -8,7 +8,7 @@ from . import api
 class PaystackAPI(object):
     def __init__(self, django=True, **kwargs):
         if django:
-            from . import settings
+            from paystack.frameworks.django import settings
 
             self.public_key = kwargs.get("public_key", settings.PAYSTACK_PUBLIC_KEY)
             self.secret_key = kwargs.get("secret_key", settings.PAYSTACK_SECRET_KEY)
@@ -70,7 +70,7 @@ class PaystackAPI(object):
 
     def processor_info(self, amount, redirect_url=None):
         return {
-            "amount": float("%.2f" % amount),
+            "amount": amount * 100,
             "js_script": get_js_script(),
             "key": self.public_key,
             "redirect_url": redirect_url,
@@ -84,7 +84,7 @@ def load_lib(config=None):
     """
     dynamically import the paystack module to use
     """
-    from . import settings
+    from .frameworks.django import settings
 
     config_lib = config or settings.PAYSTACK_LIB_MODULE
     module = importlib.import_module(config_lib)

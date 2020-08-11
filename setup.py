@@ -8,8 +8,8 @@ with open(os.path.join(os.path.dirname(__file__), "README.md")) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name="django-paystack",
-    version="0.9.3",
+    name="pypaystack",
+    version="1.0.7",
     packages=find_packages(),
     include_package_data=True,
     license="MIT License",  # example license
@@ -26,15 +26,16 @@ setup(
         # "requests-async",
         # "requests-async @ https://github.com/encode/requests-async/archive/master.zip",
     ],
+    extras_require={"django": ["django>=2.0"], "starlette": ["starlette==0.12.13"]},
     # dependency_links=[
-        # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
+    # "http://github.com/SergeySatskiy/cdm-pythonparser/archive/v2.0.1.tar.gz"
     # ],
     classifiers=[
         "Environment :: Web Environment",
         "Framework :: Django",
         "Framework :: Django :: X.Y",  # replace "X.Y" as appropriate
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: BSD License",  # example license
+        "License :: OSI Approved :: MIT License",  # example license
         "Operating System :: OS Independent",
         "Programming Language :: Python",
         # Replace these appropriately if you are stuck on Python 2.

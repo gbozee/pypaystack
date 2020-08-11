@@ -2,3 +2,4 @@
 pytest-django
 pytest-mock
 pytest-cov
+httpx

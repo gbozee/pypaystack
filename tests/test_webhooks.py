@@ -1,4 +1,4 @@
-from paystack import signals
+from paystack.api import signals
 from dispatch import receiver
 import pytest
 

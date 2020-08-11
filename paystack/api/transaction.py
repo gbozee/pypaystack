@@ -120,7 +120,9 @@ class Transaction(BaseClass):
             "email": kwargs["email"],
             "amount": kwargs["amount"] * 100,
         }
-        response = self.make_request("POST", path, json=json_data)
+        if 'order' in kwargs:
+            json_data['reference']  = kwargs['order']
+        response = self.make_request('POST', path, json=json_data)
         return self.result_format(response)
 
     def check_authorization(self, **kwargs):

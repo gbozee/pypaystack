@@ -91,6 +91,17 @@ class Transfer(BaseClass):
         req = self.make_request("POST", path, json=json)
         return self.result_format(req)
 
+    def create_transfer_code(self, recipient_code, amount, reason=""):
+        data = self.initialize_transfer(amount, recipient_code, reason)
+        return self._transfer_response(data)
+
+    def _transfer_response(self, result):
+        if len(result) == 3:
+            transfer_code = result[2]["transfer_code"]
+            msg = result[1]
+            return transfer_code, msg
+        return None, None
+
     def bulk_transfer(self, array_of_recipient_with_amount):
         transform = [
             {"amount": x["amount"] * 100, "recipient": x["recipient"]}
@@ -134,6 +145,18 @@ class Transfer(BaseClass):
         """Fetch the transfer for a given recipient"""
         req = self.make_request("GET", "/transfer/" + transfer_recipient)
         return self.result_format(req)
+
+    def get_banks(self):
+        """Fetch the list of banks supported by paystack"""
+        req = self.make_request("GET", "/bank")
+        return self.result_format(req)
+
+    def get_bank(self, bank_name):
+        result = self.get_banks()
+        if len(result) > 2:
+            instance = [x for x in result[2] if bank_name.lower() in x["name"].lower()]
+            if instance:
+                return instance[0]
 
     def get_bank_code(self, bank_name):
         options = {

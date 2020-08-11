@@ -1,18 +1,20 @@
-## Django Paystack
+## PyPaystack
 
 [![Build Status](https://travis-ci.org/gbozee/django-paystack.svg?branch=master
 )](https://travis-ci.org/gbozee/django-paystack.svg?branch=master
 )
 
 
-This is a reusable django library that makes it very easy to hook up [Paystack]() purchase button to your site/app. It helps with the verification of the transaction and is highly conifgurable.
+This is a reusable python library that makes it very easy to hook up [Paystack]() purchase button to your site/app. Framework specific integration e.g [Django]() and [Starlette]() are provided by default.
+The library also helps with verification of transactions and is highly configurable.
 
 Usage:
+1. Install `pypaystack`
+```
+pip install -e git+https://github.com/gbozee/pypaystack.git@master#egg=paystack
+```
 
-1. Install `django-paystack`
-```
-pip install -e git+https://github.com/gbozee/django-paystack.git@master#egg=paystack
-```
+### Django Specific Setup
 
 2. Add `paystack` to your `settings` module
 ```
@@ -74,6 +76,8 @@ def on_payment_verified(sender, ref,amount, **kwargs):
     """
     pass
 ```
+
+### Starlette Specific setup
 
 ### Configurations
 
