@@ -16,9 +16,16 @@ class PaystackAPI(object):
         else:
             for key, value in kwargs.items():
                 setattr(self, key, value)
-        self.transaction_api = api.Transaction(self.make_request)
+        self.transaction_api = api.Transaction(
+            self.make_request, secret_key=self.secret_key, public_key=self.public_key
+        )
         self.customer_api = api.Customer(self.make_request)
-        self.transfer_api = api.Transfer(self.make_request, self.async_make_request)
+        self.transfer_api = api.Transfer(
+            self.make_request,
+            self.async_make_request,
+            secret_key=self.secret_key,
+            public_key=self.public_key,
+        )
         self.webhook_api = api.Webhook(self.secret_key)
         self.subscription_api = api.PlanAndSubscription(self.make_request)
 
@@ -63,10 +70,10 @@ class PaystackAPI(object):
 
     def processor_info(self, amount, redirect_url=None):
         return {
-            "amount": float("%.2f"%amount),
+            "amount": float("%.2f" % amount),
             "js_script": get_js_script(),
             "key": self.public_key,
-            "redirect_url": redirect_url
+            "redirect_url": redirect_url,
         }
 
     def other_payment_info(self, **kwargs):

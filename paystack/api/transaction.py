@@ -167,4 +167,22 @@ class Transaction(BaseClass):
         return self.result_format(response)
 
     def build_transaction_obj(self, currency="ngn", **kwargs):
-        pass
+        json_data = {
+            "key": self.public_key,
+            "email": kwargs.get("email"),
+            "amount": int(kwargs["amount"]),
+            "ref": kwargs.get("reference") or kwargs.get("order"),
+            "currency": currency.lower(),
+        }
+        if kwargs.get("first_name") and kwargs.get("last_name"):
+            json_data["label"] = f"{kwargs['first_name']} {kwargs['last_name']}"
+        if kwargs.get("items"):
+            json_data["metadata"] = kwargs["items"]
+        if kwargs.get("subaccount"):
+            json_data["subaccount"] = kwargs["subaccount"]
+            json_data["bearer"] = kwargs.get("bearer") or "subaccount"
+            if kwargs.get("split_code"):
+                json_data["split_code"] = kwargs["split_code"]
+        if kwargs.get("plan"):
+            json_data["plan"] = kwargs["plan"]
+        return json_data
