@@ -70,7 +70,7 @@ class PaystackAPI(object):
 
     def processor_info(self, amount, redirect_url=None):
         return {
-            "amount": amount * 100,
+            "amount": amount,
             "js_script": get_js_script(),
             "key": self.public_key,
             "redirect_url": redirect_url,
