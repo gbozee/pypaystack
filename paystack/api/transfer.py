@@ -1,6 +1,6 @@
 from .base import BaseClass
 from dateutil import parser
-import requests_async
+import requests as  requests_async
 import asyncio
 
 
