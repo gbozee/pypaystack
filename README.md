@@ -166,7 +166,7 @@ This library provides the webhook url and exposes a signal for you to listen to 
 from paystack.signals import event_signal
 from django.dispatch import receiver
 
-@reciever(event_signal)
+@receiver(event_signal)
 def on_event_received(sender, event, data):
    # sender is the raw request
    # event is the event name that was passed https://developers.paystack.co/docs/events
