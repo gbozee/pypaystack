@@ -135,33 +135,34 @@ class Transfer(BaseClass):
         return self.result_format(req)
 
     def get_bank_code(self, bank_name):
-        options = {
-            "Citibank": "023",
-            "Access Bank": "044",
-            "Diamond Bank": "063",
-            "Ecobank Nigeria": "050",
-            "Enterprise Bank": "084",
-            "Fidelity Bank Nigeria": "070",
-            "First Bank of Nigeria": "011",
-            "First City Monument Bank": "214",
-            "Guaranty Trust Bank": "058",
-            "Heritage Bank": "030",
-            "Keystone Bank Limited": "082",
-            "Mainstreet Bank": "014",
-            "Skye Bank": "076",
-            "Stanbic IBTC Bank": "221",
-            "Standard Chartered Bank": "068",
-            "Sterling Bank": "232",
-            "Union Bank of Nigeria": "032",
-            "United Bank for Africa": "033",
-            "Unity Bank": "215",
-            "Wema Bank": "035",
-            "Zenith Bank": "057",
-            "Jaiz Bank": "301",
-            "Suntrust Bank": "100",
-            "Providus Bank": "101",
-            "Parallex Bank": "526",
-        }
+        status, message, data, _ = self.get_banks()
+        options = {x["name"]: x["code"] for x in data}
+        # options = {#     "Citibank": "023",
+        #     "Access Bank": "044",
+        #     "Diamond Bank": "063",
+        #     "Ecobank Nigeria": "050",
+        #     "Enterprise Bank": "084",
+        #     "Fidelity Bank Nigeria": "070",
+        #     "First Bank of Nigeria": "011",
+        #     "First City Monument Bank": "214",
+        #     "Guaranty Trust Bank": "058",
+        #     "Heritage Bank": "030",
+        #     "Keystone Bank Limited": "082",
+        #     "Mainstreet Bank": "014",
+        #     "Skye Bank": "076",
+        #     "Stanbic IBTC Bank": "221",
+        #     "Standard Chartered Bank": "068",
+        #     "Sterling Bank": "232",
+        #     "Union Bank of Nigeria": "032",
+        #     "United Bank for Africa": "033",
+        #     "Unity Bank": "215",
+        #     "Wema Bank": "035",
+        #     "Zenith Bank": "057",
+        #     "Jaiz Bank": "301",
+        #     "Suntrust Bank": "100",
+        #     "Providus Bank": "101",
+        #     "Parallex Bank": "526",
+        # }
         return options.get(bank_name)
 
     def check_balance(self):
@@ -233,4 +234,3 @@ class Transfer(BaseClass):
 
 
 filters = {"r_kind": "recipient_name", "recipient": "Abiola Oyeniyi"}
-
