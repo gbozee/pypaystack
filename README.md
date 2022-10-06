@@ -11,7 +11,7 @@ The library also helps with verification of transactions and is highly configura
 Usage:
 1. Install `pypaystack`
 ```
-pip install -e git+https://github.com/gbozee/pypaystack.git@master#egg=paystack
+pip install -e git+https://github.com/gbozee/pypaystack.git@master#egg=pypaystack
 ```
 
 ### Django Specific Setup
